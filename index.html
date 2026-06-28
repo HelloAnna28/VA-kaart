@@ -169,7 +169,7 @@ function renderForm(){
       ${state.si>0 ? `<button class="btn btn--ghost" id="back">Terug</button>` : ""}
       ${!last ? `<button class="btn btn--primary" id="next">Volgende deel</button>` : ""}
       ${last ? `<button class="btn btn--primary" id="gen" ${answered()<5?"disabled":""}>Genereer mijn VA Kracht Kaart</button>` : ""}
-      ${last && answered()<5 ? `<span style="font-size:13px;color:var(--muted);">Vul minstens 5 vragen in voor een goede analyse.</span>` : ""}
+      ${last && answered()<5 ? `<span style="font-size:13px;color:var(--muted);">Vul het liefst alle vragen in, dat geeft de beste kaart.</span>` : ""}
     </div>`;
 
   app.querySelectorAll("textarea").forEach(t => {
