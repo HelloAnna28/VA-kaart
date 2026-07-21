@@ -57,63 +57,89 @@ const BOOKING_URL = "https://tidycal.com/loyalvacoaching/kennismaking";
 const MIRROR_MSG = "Hey! Ik ben bezig met een oefening voor mijn VA-bedrijf en ik heb jouw eerlijke mening nodig. Kun je me vertellen: 1) Waarvoor bel of app je mij als je ergens niet uitkomt? 2) Wat zou jij zeggen als je mij aan iemand anders zou omschrijven? \u2764\uFE0F";
 
 const SECTIONS = [
-  { title: "Wat anderen al lang in jou zien",
-    intro: "Anderen zien jou vaak helderder dan jij jezelf ziet. Begin hier.",
+// ── STAP 1: Vervang de SECTIONS-array in index.html door dit blok ──
+
+const SECTIONS = [
+
+  {
+    title: "Wat anderen al lang in jou zien",
+    intro: "We beginnen niet bij jou, maar bij de mensen om je heen. Anderen zien jou vaak veel helderder dan jij jezelf ziet. Dit zijn je blinde vlekken — dingen die voor jou vanzelfsprekend zijn, maar voor anderen goud waard. Wees eerlijk en concreet: geen 'ik ben communicatief sterk', maar een echt voorbeeld.",
     qs: [
-      { id:"q1", label:"Waar vragen mensen jou altijd om hulp — ook buiten werk, ook privé?" },
-      { id:"q2", label:"Wat zeiden collega\u2019s of leidinggevenden dat je goed deed, terwijl jij dacht \u201cmaar dat is toch normaal?\u201d" },
-      { id:"q3", label:"Als je beste vriendin jou zou omschrijven aan een ondernemer die hulp zoekt — wat zou ze zeggen?" },
-      { id:"q4", label:"Wat zeg jij als iemand je een compliment geeft?", hint:"Als je het wegwuift, is d\u00e1t vaak precies de skill die je verbergt." },
-    ] },
-  { title: "De goudmijn uit loondienst",
-    intro: "Je jaren in loondienst zijn het bewijs dat je al lang doet wat ondernemers nodig hebben.",
+      { id:"q1", label:"Waar vragen mensen jou altijd om hulp — ook buiten werk, ook privé? Noem minimaal 2 concrete voorbeelden.", hint:"Denk aan: 'Mijn vriendinnen vragen altijd of ik hun mailbox wil bekijken' of 'Op werk kwamen ze altijd bij mij voor de planning.'" },
+      { id:"q2", label:"Wat zeiden collega's, leidinggevenden of klanten dat jij goed deed — terwijl jij dacht 'maar dat is toch normaal'?", hint:"Als je denkt 'dat kan iedereen', stop dan. Dat is precies het antwoord dat we zoeken." },
+      { id:"q3", label:"Als je beste vriendin jou zou omschrijven aan een ondernemer die hulp zoekt — wat zou ze concreet zeggen? Schrijf het op alsof zij het zegt." },
+      { id:"q4", label:"Wat wuif jij weg als iemand je een compliment geeft?", hint:"'Ach, dat stelde niks voor.' — Wat stelde het dan wél voor? Dat is je blinde vlek." },
+    ]
+  },
+
+  {
+    title: "De goudmijn uit je loondienst",
+    intro: "Je jaren in loondienst zijn geen bijzaak — het is het bewijs dat je al lang doet wat ondernemers hard nodig hebben. We gaan die ervaring nu omzetten naar waarde. Wees specifiek: sector, taken, aantallen, resultaten. Vage antwoorden als 'ik deed administratie' zijn niet genoeg. Wat deed je precies?",
     qs: [
-      { id:"q5", label:"Welke taken deed jij makkelijk, terwijl collega\u2019s er tegenop zagen of er langer over deden?" },
-      { id:"q6", label:"Voor welke vragen of problemen kwamen mensen \u00e9\u00e9rst bij jou?" },
-      { id:"q7", label:"Noem een moment waarop iets dankzij jou goed liep. Wat deed je precies?", hint:"Ook als het klein voelt." },
-      { id:"q8", label:"Welke klussen rondde je af waarvan anderen zeiden \u201choe doe jij dat zo snel, netjes of rustig?\u201d" },
-    ] },
-  { title: "Jouw VA-praktijk als spiegel",
-    intro: "Je bent al begonnen — dus je hebt al data. Elke klus vertelt iets over je kracht.",
+      { id:"q5", label:"Welke taken deed jij moeiteloos, terwijl collega's er tegenop zagen of er veel langer over deden? Geef een concreet voorbeeld." },
+      { id:"q6", label:"Voor welke vragen of problemen kwamen mensen éérst bij jou? Wat maakte jou de aangewezen persoon daarvoor?" },
+      { id:"q7", label:"Beschrijf een moment waarop iets dankzij jou goed liep. Wat was de situatie, wat deed jij precies, en wat was het resultaat?", hint:"'Ik heb eens een hele planning omgegooid toen een collega uitviel, zodat de klant er niets van merkte.' Zo concreet mag het zijn." },
+      { id:"q8", label:"In welke sector of branche heb je gewerkt, hoeveel jaar, en wat waren je belangrijkste verantwoordelijkheden?" },
+    ]
+  },
+
+  {
+    title: "Wat jij al doet — ook zonder betaalde klanten",
+    intro: "Je hoeft nog geen factuur te hebben gestuurd om bewijs te hebben van je kracht. Kijk verder dan 'officieel werk'. Heb je iets geregeld voor een vriend, familie, een vrijwilligersproject, of als proef? Dat telt allemaal. Wees eerlijk — ook kleine dingen zijn relevant.",
     qs: [
-      { id:"q9", label:"Welke klussen voor (proef)klanten gingen jou makkelijk af, terwijl de klant er enorm tegenop zag?" },
-      { id:"q10", label:"Waar gaf een klant je een compliment dat jij wegwuifde met \u201cach, dat is gewoon mijn werk\u201d?" },
-      { id:"q11", label:"Welke opdrachten neem je nu aan terwijl je er geen energie van krijgt?" },
-      { id:"q12", label:"Wat zeg je nu als iemand vraagt wat je doet? Schrijf het letterlijk op.", hint:"Lees het terug: voelt het scherp of vaag?" },
-    ] },
-  { title: "Energie als kompas",
-    intro: "Energie liegt nooit. Wat je energie geeft, is bijna altijd ook iets wat je goed doet.",
+      { id:"q9", label:"Heb je al iets gedaan voor een ondernemer, bekende of in een proefproject — hoe klein ook? Wat deed je precies en wat was de reactie?" },
+      { id:"q10", label:"Wat deed jij voor iemand waarbij diegene zei 'oh fijn, hier had ik zelf uren over gedaan'? Ook in privésituaties.", hint:"Een agenda bijhouden, een tekst nakijken, een evenement organiseren — alles telt." },
+      { id:"q11", label:"Welke VA-taken trekken je aan en welke absoluut niet? Schrijf eerlijk op wat je energie geeft en wat je liever vermijdt." },
+      { id:"q12", label:"Als je morgen je eerste klant mocht kiezen: wie is dat, en wat doe je precies voor haar of hem?", hint:"Geen goed of fout antwoord — gewoon je eerste eerlijke gevoel." },
+    ]
+  },
+
+  {
+    title: "Energie als kompas",
+    intro: "Energie liegt nooit. Wat jou energie geeft, is bijna altijd ook iets wat je goed doet — en waar klanten voor willen betalen. Dit onderdeel gaat niet over wat je 'zou moeten' aanbieden, maar over wat je écht trekt. Wees eerlijk, ook als het antwoord je verrast.",
     qs: [
-      { id:"q13", label:"Welke taken doe jij als eerste, gewoon omdat je er zin in hebt?" },
-      { id:"q14", label:"Waarbij verlies jij het gevoel voor tijd?", hint:"Ook buiten werk: hobby\u2019s, klusjes, gesprekken." },
-      { id:"q15", label:"Wat doe je in je vrije tijd dat eigenlijk professionele waarde heeft, maar wat je geen \u201cecht werk\u201d noemt?" },
-      { id:"q16", label:"Als je vanaf morgen nog maar \u00e9\u00e9n soort klus mag doen voor klanten — welke kies je?" },
-    ] },
-  { title: "De blinde vlek doorprikken",
-    intro: "Blinde vlekken zitten verstopt achter \u201cmaar dat kan toch iedereen?\u201d. Spoiler: nee, dat kan niet iedereen.",
+      { id:"q13", label:"Welke taken doe jij als eerste, gewoon omdat je er zin in hebt — ook al staan ze niet op je to-do lijst?" },
+      { id:"q14", label:"Waarbij verlies jij het gevoel voor tijd?", hint:"Ook buiten werk: een hobby, een gesprek, een klus. Als je vergeet te eten, zit je waarschijnlijk in je kracht." },
+      { id:"q15", label:"Wat doe je in je vrije tijd dat eigenlijk professionele waarde heeft, maar wat je geen 'echt werk' noemt?" },
+      { id:"q16", label:"Als je vanaf morgen nog maar één soort klus mag doen voor klanten — welke kies je, en waarom die?" },
+    ]
+  },
+
+  {
+    title: "De verborgen expertise blootleggen",
+    intro: "Achter 'maar dat kan toch iedereen?' zit bijna altijd een skill die anderen niet hebben. Dit kwadrant gaat over wat jij weet maar onderschat. We gaan het nu benoemen — concreet, zonder wegwuiven.",
     qs: [
-      { id:"q17", label:"Wat vind jij z\u00f3 vanzelfsprekend dat je het nooit een skill zou noemen?" },
-      { id:"q18", label:"Wat kunnen anderen aantoonbaar sl\u00e9cht, terwijl jij het moeiteloos doet?" },
-      { id:"q19", label:"Waar worden mensen zenuwachtig of gestrest van, terwijl jij er rustig onder blijft?" },
-      { id:"q20", label:"Wie probeert iets zelf op te lossen, maar wacht eigenlijk op jou omdat jij het beter of sneller doet?" },
-    ] },
-  { title: "De echte twijfel onder ogen",
-    intro: "Veel gestarte VA\u2019s twijfelen niet omdat ze niet goed genoeg zijn, maar omdat ze zich vergelijken met VA\u2019s die \u201cmeer tools kennen\u201d. Hier kijken we dat recht in de ogen.",
+      { id:"q17", label:"Wat vind jij zó vanzelfsprekend dat je het nooit een skill zou noemen? Noem minimaal 3 dingen." },
+      { id:"q18", label:"Wat kunnen anderen aantoonbaar slecht of langzaam, terwijl jij het moeiteloos doet?" },
+      { id:"q19", label:"Waar worden mensen zenuwachtig of gestrest van, terwijl jij er rustig onder blijft? Wat doe jij dan dat zij niet doen?" },
+      { id:"q20", label:"Welke kennis, tool of vaardigheid heb jij opgedaan — in loondienst of daarbuiten — die een ondernemer nu meteen kan gebruiken?" },
+    ]
+  },
+
+  {
+    title: "De twijfel recht in de ogen",
+    intro: "Bijna elke VA twijfelt — niet omdat ze niet goed genoeg is, maar omdat ze zichzelf vergelijkt. Of omdat ze wacht tot ze 'klaar' is. Hier kijken we die twijfel recht in de ogen. Geen sugarcoating — eerlijkheid brengt je verder dan geruststelling.",
     qs: [
-      { id:"q25", label:"Wat denk jij dat de reden is dat klanten (nog) niet voor jou kiezen?" },
-      { id:"q26", label:"Met welke VA\u2019s vergelijk jij jezelf — en wat doet die vergelijking met je tarief, zichtbaarheid en aanbod?" },
-      { id:"q27", label:"Als een vriendin met exact jouw skills vroeg \u201cben ik goed genoeg?\u201d — wat zou jij tegen h\u00e1\u00e1r zeggen?" },
-      { id:"q28", label:"Is jouw twijfel een feit of een aanname? Welk bewijs uit dit werkblad spreekt hem tegen?" },
-    ] },
-  { title: "Jouw bewijsmuur",
-    intro: "Tijd om bewijs te stapelen. Groot of klein, betaald of onbetaald, priv\u00e9 of werk — alles telt.",
+      { id:"q25", label:"Wat houdt jou nu concreet tegen om jezelf als VA aan te bieden of je tarieven te noemen?", hint:"'Ik ben niet goed genoeg' is geen antwoord — wat maakt jou niet goed genoeg? Wees specifiek." },
+      { id:"q26", label:"Met wie vergelijk jij jezelf, en waarom denk je dat zij meer waard zijn dan jij?" },
+      { id:"q27", label:"Als een vriendin met exact jouw achtergrond en ervaring vroeg 'ben ik goed genoeg om VA te zijn?' — wat zou jij letterlijk tegen haar zeggen?" },
+      { id:"q28", label:"Is jouw twijfel een feit of een aanname? Zoek in je antwoorden hierboven naar bewijs dat haar tegenspreekt." },
+    ]
+  },
+
+  {
+    title: "Jouw bewijsmuur — alles op een rij",
+    intro: "Dit is het laatste onderdeel. We gaan nu alles wat je hebt opgeschreven samenvatten tot concreet bewijs. Groot of klein, betaald of onbetaald, privé of werk — alles telt mee. Na dit onderdeel weet jij wat jij waard bent als VA.",
     qs: [
-      { id:"lijst10", label:"Schrijf de laatste 10 dingen op die jij voor iemand anders hebt gedaan.", hint:"E\u00e9n per regel. Agenda plannen, een mail nalezen, iets uitzoeken, een conflict oplossen\u2026", big:true },
-      { id:"q29", label:"Welke taken doe jij telkens opnieuw, voor verschillende mensen?", hint:"Dat patroon is jouw kracht." },
-      { id:"q30", label:"Noem 3 concrete dingen die jij hebt georganiseerd, gemaakt of geregeld waar iemand blij van werd." },
-      { id:"q31", label:"Heb je ooit iemand geld, tijd of stress bespaard? Wat deed je precies?" },
-      { id:"q32", label:"Wat heb jij geleerd — in loondienst of daarbuiten — dat een ondernemer nu meteen kan gebruiken?" },
-    ] },
+      { id:"lijst10", label:"Schrijf de laatste 5 dingen op die jij voor iemand anders hebt geregeld, gemaakt of opgelost.", hint:"Één per regel. Agenda plannen, mail nalezen, iets uitzoeken, conflict oplossen, presentatie maken — alles telt.", big:true },
+      { id:"q29", label:"Welke taken doe jij telkens opnieuw, voor verschillende mensen? Dat patroon is geen toeval — dat is jouw kracht." },
+      { id:"q30", label:"Noem 3 concrete momenten waarop iemand blij, opgelucht of dankbaar was dankzij iets wat jij deed." },
+      { id:"q31", label:"Heb je ooit iemand aantoonbaar geld, tijd of stress bespaard? Beschrijf wat je deed en wat het opleverde." },
+      { id:"q32", label:"Koppel nu je antwoorden: wat zeggen anderen over jou (deel 1) en wat heb jij al bewezen (deel 2 t/m 6)? Waar overlappen die? Dat is jouw onderscheidende positie als VA." },
+    ]
+  },
+
+];
 ];
 const ALL = SECTIONS.flatMap(s => s.qs);
 
