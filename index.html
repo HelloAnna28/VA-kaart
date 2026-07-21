@@ -33,6 +33,8 @@ textarea:focus{border-color:var(--primary2);box-shadow:0 0 0 3px rgba(63,5,8,.16
 .eyebrow{font-weight:700;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);}
 .q{font-weight:600;font-size:15px;margin-bottom:7px;}
 .hint{font-size:13px;color:var(--muted);margin-bottom:9px;font-style:italic;}
+.live-feedback{font-size:13px;color:var(--accent);font-weight:600;margin-top:7px;padding:8px 12px;
+  background:#FFF8F0;border-radius:8px;border-left:3px solid var(--accent);}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:18px;}
 .progress{height:6px;background:var(--line);border-radius:999px;}
 .progress > div{height:6px;background:var(--accent);border-radius:999px;transition:width .3s;}
@@ -123,295 +125,291 @@ const SECTIONS = [
       { id:"q29", label:"Welke taken doe jij telkens opnieuw, voor verschillende mensen? Dat patroon is geen toeval, dat is jouw kracht." },
       { id:"q30", label:"Noem 3 concrete momenten waarop iemand blij, opgelucht of dankbaar was dankzij iets wat jij deed." },
       { id:"q31", label:"Heb je ooit iemand aantoonbaar geld, tijd of stress bespaard? Beschrijf wat je deed en wat het opleverde." },
-      { id:"q32", label:"Wat is iets in jouw vakgebied of branche waar jij een sterke mening over hebt?", hint:"Denk aan de sector waar jij vandaan komt: HR, zorg, onderwijs, retail, horeca, administratie, noem maar op. Wat zie jij daar wat anderen fout doen, of wat doe jij juist anders dan de meeste? Dat is je visie, en die maakt je onvergetelijk." }
+      { id:"q32", label:"Wat is iets in jouw vakgebied of branche waar jij een sterke mening over hebt?", hint:"Denk aan de sector waar jij vandaan komt: HR, zorg, onderwijs, retail, administratie, noem maar op. Wat zie jij daar wat anderen fout doen, of wat doe jij juist anders? Dat is je visie, en die maakt je onvergetelijk." }
     ]
   }
 ];
 
-const ALL = SECTIONS.flatMap(s => s.qs);
+const ALL = SECTIONS.flatMap(function(s){ return s.qs; });
 const state = { phase:"intro", si:0, answers:{}, result:null, copied:false, copiedMsg:false };
 const app = document.getElementById("app");
-const esc = (s) => (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-const answered = () => ALL.filter(q => (state.answers[q.id]||"").trim()).length;
+
+function esc(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function answered(){ return ALL.filter(function(q){ return (state.answers[q.id]||"").trim(); }).length; }
+
+function getFeedback(qId, a){
+  var s = (a||"").trim();
+  if(!s) return null;
+  var low = s.toLowerCase();
+  var kort = s.length < 25;
+
+  if(qId === "q1"){
+    if(kort || low.indexOf("van alles") > -1) return "Mooi dat je dit noemt! Kun je een concreet voorbeeld geven? Wie vroeg je precies om hulp, en waarmee?";
+  }
+  if(qId === "q2"){
+    if(kort || low.indexOf("communicatie") > -1 || low.indexOf("proactief") > -1) return "Dit zijn woorden die heel veel VA's gebruiken. Wat zei die collega of leidinggevende echt? Hoe concreter, hoe beter je kaart wordt.";
+  }
+  if(qId === "q3"){
+    if(kort) return "Doe eens alsof je vriendin het echt uitspreekt. Hoe klinkt dat? Schrijf het op in haar woorden.";
+  }
+  if(qId === "q5"){
+    if(kort || low.indexOf("administratie") > -1 || low.indexOf("alles") > -1) return "Goed begin! Maar wat deed je dan precies? 'Administratie' kan van alles zijn. Geef een concreet voorbeeld van een taak die jij makkelijk afhandelde.";
+  }
+  if(qId === "q7"){
+    if(kort) return "Dit is een van de krachtigste vragen. Denk aan een echt moment: wat was er aan de hand, wat deed jij, en wat was het resultaat?";
+  }
+  if(qId === "q9"){
+    if(low === "nee" || low.indexOf("nog niet") > -1 || low.indexOf("nvt") > -1 || low === "n.v.t.") return "Geen betaalde klanten is helemaal oké! Maar heb je dan iets gedaan voor een vriend, familielid, of als proef? Zelfs een kleine klus telt.";
+    if(kort) return "Geef even wat meer detail: wat deed je precies, en hoe reageerde diegene?";
+  }
+  if(qId === "q17"){
+    if(kort || low.indexOf("organiseren") > -1 || low.indexOf("plannen") > -1 || low.indexOf("communiceren") > -1) return "Dit zijn woorden die bijna iedereen opschrijft. Wat is iets wat jij doet waarvan mensen zeggen 'hoe doe jij dat zo makkelijk'? Dat is de skill die we zoeken.";
+  }
+  if(qId === "q25"){
+    if(kort || low.indexOf("niet goed genoeg") > -1) return "Probeer hier specifieker te zijn. Wat maakt je niet goed genoeg? Is het kennis, ervaring, zelfvertrouwen, of iets anders? Dat helpt me om die twijfel goed te weerleggen.";
+  }
+  if(qId === "q32"){
+    if(kort || low.indexOf("weet niet") > -1 || low.indexOf("geen idee") > -1) return "Er is echt iets wat jou stoort of opvalt in de branche waar je vandaan komt. Iets waarbij je denkt: dit kan zoveel beter, of: dit doe ik juist anders. Wat is dat?";
+  }
+  if((low.indexOf("ik ben goed in") > -1) && kort) return "Goed begin! Maar goed in wat precies? Geef een concreet voorbeeld van wanneer je dat liet zien.";
+  if((low.indexOf("ik help graag") > -1) && kort) return "Fijn dat je dat weet! Maar wie help je het liefst, en met wat precies? Hoe specifieker, hoe sterker je kaart.";
+  if(low === "nvt" || low === "n.v.t." || low === "-" || low === "nee") return "Sla deze vraag niet over als je hem kunt invullen. Zelfs een klein voorbeeld is waardevol.";
+  return null;
+}
+
+function attachFeedback(container){
+  container.querySelectorAll("textarea").forEach(function(t){
+    t.addEventListener("blur", function(){
+      var a = t.value.trim();
+      var qId = t.dataset.id;
+      var feedback = getFeedback(qId, a);
+      var existing = t.parentNode.querySelector(".live-feedback");
+      if(existing) existing.remove();
+      if(feedback){
+        var el = document.createElement("div");
+        el.className = "live-feedback";
+        el.textContent = feedback;
+        t.parentNode.appendChild(el);
+      }
+    });
+    t.addEventListener("focus", function(){
+      var existing = t.parentNode.querySelector(".live-feedback");
+      if(existing) existing.remove();
+    });
+  });
+}
 
 function render(){
   if(state.phase === "intro") renderIntro();
   else if(state.phase === "form") renderForm();
+  else if(state.phase === "vague") renderVague();
   else if(state.phase === "loading") renderLoading();
   else if(state.phase === "error") renderError();
   else if(state.phase === "result") renderResult();
 }
 
 function renderIntro(){
-  app.innerHTML = `
-    <div class="card">
-      <div class="eyebrow">Werkblad</div>
-      <h1 style="font-size:30px;margin:8px 0 14px;">Jij kunt meer dan je verkoopt</h1>
-      <p style="color:var(--muted);margin-bottom:16px;">Je kunt je werk goed. Maar als iemand vraagt wat je precies doet, hoor je jezelf iets vaags zeggen. Het probleem is niet dat jij niets bijzonders kunt. Je vindt je kracht zo vanzelfsprekend dat je hem zelf niet meer ziet. Dit werkblad helpt je hem terug te vinden: zwart op wit, met bewijs.</p>
-      <p style="font-size:14px;color:var(--muted);margin-bottom:22px;">7 korte delen, ongeveer een half uur. Je antwoorden blijven op dit scherm. Aan het eind krijg je je persoonlijke VA Kaart.</p>
-      <button class="btn btn--primary" id="start">Start het werkblad</button>
-    </div>`;
-  document.getElementById("start").onclick = () => { state.phase="form"; render(); };
+  app.innerHTML = '<div class="card">'
+    + '<div class="eyebrow">Werkblad</div>'
+    + '<h1 style="font-size:30px;margin:8px 0 14px;">Jij kunt meer dan je verkoopt</h1>'
+    + '<p style="color:var(--muted);margin-bottom:16px;">Je kunt je werk goed. Maar als iemand vraagt wat je precies doet, hoor je jezelf iets vaags zeggen. Het probleem is niet dat jij niets bijzonders kunt. Je vindt je kracht zo vanzelfsprekend dat je hem zelf niet meer ziet. Dit werkblad helpt je hem terug te vinden: zwart op wit, met bewijs.</p>'
+    + '<p style="font-size:14px;color:var(--muted);margin-bottom:22px;">7 korte delen, ongeveer een half uur. Je antwoorden blijven op dit scherm. Aan het eind krijg je je persoonlijke VA Kaart.</p>'
+    + '<button class="btn btn--primary" id="start">Start het werkblad</button>'
+    + '</div>';
+  document.getElementById("start").onclick = function(){ state.phase="form"; render(); };
 }
 
 function renderForm(){
-  const sec = SECTIONS[state.si];
-  const qsHtml = sec.qs.map(q => `
-    <div style="margin-bottom:20px;">
-      <div class="q">${esc(q.label)}</div>
-      ${q.hint ? `<div class="hint">${esc(q.hint)}</div>` : ""}
-      <textarea data-id="${q.id}" placeholder="Jouw antwoord..." style="${q.big?'min-height:130px;':''}">${esc(state.answers[q.id]||"")}</textarea>
-    </div>`).join("");
+  var sec = SECTIONS[state.si];
+  var qsHtml = sec.qs.map(function(q){
+    return '<div style="margin-bottom:20px;">'
+      + '<div class="q">' + esc(q.label) + '</div>'
+      + (q.hint ? '<div class="hint">' + esc(q.hint) + '</div>' : '')
+      + '<textarea data-id="' + q.id + '" placeholder="Jouw antwoord..." style="' + (q.big ? 'min-height:130px;' : '') + '">' + esc(state.answers[q.id]||"") + '</textarea>'
+      + '</div>';
+  }).join("");
 
-  const last = state.si === SECTIONS.length - 1;
-  app.innerHTML = `
-    <div class="noprint" style="margin-bottom:16px;">
-      <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:6px;">
-        <span>Deel ${state.si+1} van ${SECTIONS.length}</span><span id="counter">${answered()} vragen ingevuld</span>
-      </div>
-      <div class="progress"><div style="width:${((state.si+1)/SECTIONS.length)*100}%"></div></div>
-    </div>
-    <div class="card">
-      <div class="eyebrow">Deel ${state.si+1}</div>
-      <h2 style="font-size:23px;margin:6px 0 10px;">${esc(sec.title)}</h2>
-      <p style="color:var(--muted);font-size:14.5px;margin-bottom:22px;">${esc(sec.intro)}</p>
-      ${qsHtml}
-    </div>
-    <div class="row noprint">
-      ${state.si>0 ? `<button class="btn btn--ghost" id="back">Terug</button>` : ""}
-      ${!last ? `<button class="btn btn--primary" id="next">Volgende deel</button>` : ""}
-      ${last ? `<button class="btn btn--primary" id="gen" ${answered()<5?"disabled":""}>Genereer mijn VA Kaart</button>` : ""}
-      ${last && answered()<5 ? `<span style="font-size:13px;color:var(--muted);">Vul het liefst alle vragen in, dat geeft de beste kaart.</span>` : ""}
-    </div>`;
+  var last = state.si === SECTIONS.length - 1;
+  app.innerHTML = '<div class="noprint" style="margin-bottom:16px;">'
+    + '<div style="display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:6px;">'
+    + '<span>Deel ' + (state.si+1) + ' van ' + SECTIONS.length + '</span>'
+    + '<span id="counter">' + answered() + ' vragen ingevuld</span></div>'
+    + '<div class="progress"><div style="width:' + (((state.si+1)/SECTIONS.length)*100) + '%"></div></div>'
+    + '</div>'
+    + '<div class="card">'
+    + '<div class="eyebrow">Deel ' + (state.si+1) + '</div>'
+    + '<h2 style="font-size:23px;margin:6px 0 10px;">' + esc(sec.title) + '</h2>'
+    + '<p style="color:var(--muted);font-size:14.5px;margin-bottom:22px;">' + esc(sec.intro) + '</p>'
+    + qsHtml
+    + '</div>'
+    + '<div class="row noprint">'
+    + (state.si > 0 ? '<button class="btn btn--ghost" id="back">Terug</button>' : '')
+    + (!last ? '<button class="btn btn--primary" id="next">Volgende deel</button>' : '')
+    + (last ? '<button class="btn btn--primary" id="gen" ' + (answered()<5?"disabled":"") + '>Genereer mijn VA Kaart</button>' : '')
+    + (last && answered()<5 ? '<span style="font-size:13px;color:var(--muted);">Vul het liefst alle vragen in, dat geeft de beste kaart.</span>' : '')
+    + '</div>';
 
-  app.querySelectorAll("textarea").forEach(t => {
-    t.addEventListener("input", e => {
+  app.querySelectorAll("textarea").forEach(function(t){
+    t.addEventListener("input", function(e){
       state.answers[e.target.dataset.id] = e.target.value;
-      const counter = document.getElementById("counter");
-      if(counter) counter.textContent = `${answered()} vragen ingevuld`;
-      const gen = document.getElementById("gen");
+      var counter = document.getElementById("counter");
+      if(counter) counter.textContent = answered() + " vragen ingevuld";
+      var gen = document.getElementById("gen");
       if(gen) gen.disabled = answered() < 5;
     });
   });
+
   attachFeedback(app);
-  const back = document.getElementById("back"); if(back) back.onclick = () => { state.si--; scrollTo(0,0); render(); };
-  const next = document.getElementById("next"); if(next) next.onclick = () => { state.si++; scrollTo(0,0); render(); };
-  const gen = document.getElementById("gen"); if(gen) gen.onclick = () => generate();
+
+  var back = document.getElementById("back");
+  if(back) back.onclick = function(){ state.si--; scrollTo(0,0); render(); };
+  var next = document.getElementById("next");
+  if(next) next.onclick = function(){ state.si++; scrollTo(0,0); render(); };
+  var gen = document.getElementById("gen");
+  if(gen) gen.onclick = function(){ checkAndGenerate(); };
 }
 
-function renderLoading(){
-  app.innerHTML = `
-    <div class="card" style="text-align:center;">
-      <div style="display:flex;gap:8px;justify-content:center;margin-bottom:18px;">
-        <div class="dot"></div><div class="dot" style="animation-delay:.2s"></div><div class="dot" style="animation-delay:.4s"></div>
-      </div>
-      <h2 style="font-size:20px;margin-bottom:8px;">Je kracht wordt zwart op wit gezet...</h2>
-      <p style="color:var(--muted);font-size:14px;">Even geduld, ik lees al je antwoorden en haal de rode draad eruit.</p>
-    </div>`;
-}
-
-function renderError(){
-  app.innerHTML = `
-    <div class="card">
-      <h2 style="font-size:20px;margin-bottom:8px;">Er ging iets mis</h2>
-      <p style="color:var(--muted);margin-bottom:18px;">Het lukte niet om je kaart te genereren. Probeer het opnieuw.</p>
-      <button class="btn btn--primary" id="retry">Opnieuw proberen</button>
-    </div>`;
-  document.getElementById("retry").onclick = generate;
-}
-
-function renderResult(){
-  const r = state.result || {};
-  const pills = (r.helptMet||[]).map(x => `<span style="background:var(--accentSoft);color:#3F0508;font-size:13.5px;font-weight:600;padding:7px 13px;border-radius:999px;">${esc(x)}</span>`).join("");
-  const proof = (r.bewijsmuur||[]).map(x => `<div style="background:#FFFBF4;border:1px solid var(--line);border-left:3px solid var(--primary);border-radius:8px;padding:10px 13px;font-size:14.5px;">${esc(x)}</div>`).join("");
-  app.innerHTML = `
-    <div>
-      <div class="card" style="border-top:5px solid var(--accent);">
-        <div class="eyebrow">Jouw VA Kaart</div>
-        <h1 style="font-size:26px;margin:10px 0 4px;color:var(--primary);">${esc(r.krachtZin)}</h1>
-        <h3 style="font-size:16px;margin:26px 0 10px;">Ik help het beste met</h3>
-        <div style="display:flex;flex-wrap:wrap;gap:8px;">${pills}</div>
-        <h3 style="font-size:16px;margin:26px 0 10px;">Jouw bewijsmuur</h3>
-        <div style="display:grid;gap:8px;">${proof}</div>
-        <h3 style="font-size:16px;margin:26px 0 10px;">De twijfel die je vandaag loslaat</h3>
-        <p style="font-size:14.5px;">${esc(r.twijfelLoslaten)}</p>
-      </div>
-      <div class="card" style="margin-top:16px;">
-        <div class="eyebrow">Volgende stap</div>
-        <h3 style="font-size:18px;margin:6px 0 8px;">De spiegel van anderen</h3>
-        <p style="color:var(--muted);font-size:14.5px;margin-bottom:14px;">Anderen zien jouw kracht vaak nog scherper dan jij. Stuur dit appje naar 3 mensen die je goed kennen en eerlijk zijn. Neem hun antwoorden mee naar je gratis kennismakingsgesprek. Samen leg ik ze naast jouw kaart.</p>
-        <div style="background:#FFFBF4;border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:14.5px;margin-bottom:14px;">${esc(MIRROR_MSG)}</div>
-        <button class="btn btn--primary" id="copymsg">${state.copiedMsg?"Gekopieerd!":"Kopieer dit appje"}</button>
-      </div>
-      <div class="card" style="margin-top:16px;background:var(--ink);border-color:var(--ink);">
-        <div style="font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accentSoft);font-weight:700;">En nu?</div>
-        <p style="color:#FDFDED;font-size:16px;margin:10px 0 20px;font-family:'Fraunces',serif;">${esc(r.conclusie)}</p>
-        <a href="${BOOKING_URL}" target="_blank" rel="noreferrer" class="btn btn--accent">Plan je gratis kennismakingsgesprek</a>
-      </div>
-      <div class="row noprint">
-        <button class="btn btn--ghost" id="copy">${state.copied?"Gekopieerd!":"Kopieer mijn kaart"}</button>
-        <button class="btn btn--ghost" id="print">Bewaar als pdf</button>
-        <button class="btn btn--ghost" id="again">Opnieuw</button>
-      </div>
-    </div>`;
-  document.getElementById("copy").onclick = copyKaart;
-  document.getElementById("copymsg").onclick = copyMsg;
-  document.getElementById("print").onclick = () => window.print();
-  document.getElementById("again").onclick = () => { state.phase="intro"; state.si=0; state.result=null; render(); };
-}
-
-function copyMsg(){
-  navigator.clipboard.writeText(MIRROR_MSG).then(() => {
-    state.copiedMsg = true; render();
-    setTimeout(() => { state.copiedMsg = false; if(state.phase==="result") render(); }, 1800);
-  }).catch(()=>{});
-}
-
-function getFeedback(q, a){
-  if(!a || a.trim().length === 0) return null;
-  const lower = a.trim().toLowerCase();
-  const kort = a.trim().length < 25;
-
-  // Specifieke feedback per vraag
-  if(q.id === "q1"){
-    if(kort || lower.includes("van alles") || lower.includes("altijd")) return "Mooi dat je dit noemt! Kun je een concreet voorbeeld geven? Wie vroeg je precies om hulp, en waarmee?";
-  }
-  if(q.id === "q2"){
-    if(kort || lower.includes("communicatie") || lower.includes("proactief") || lower.includes("altijd")) return "Dit zijn woorden die heel veel VA's gebruiken. Wat zei die collega of leidinggevende echt? Hoe concreter, hoe beter je kaart wordt.";
-  }
-  if(q.id === "q3"){
-    if(kort) return "Doe eens alsof je vriendin het echt uitspreekt. Hoe klinkt dat? Schrijf het op in haar woorden.";
-  }
-  if(q.id === "q5"){
-    if(kort || lower.includes("administratie") || lower.includes("planning") || lower.includes("alles")) return "Goed begin! Maar wat deed je dan precies? 'Administratie' kan van alles zijn. Geef een concreet voorbeeld van een taak die jij makkelijk afhandelde.";
-  }
-  if(q.id === "q7"){
-    if(kort) return "Dit is een van de krachtigste vragen. Denk aan een echt moment: wat was er aan de hand, wat deed jij, en wat was het resultaat? Hoe concreter, hoe beter.";
-  }
-  if(q.id === "q9"){
-    if(lower.includes("nee") || lower.includes("nog niet") || lower.includes("nvt") || lower.includes("n.v.t.")) return "Geen betaalde klanten is helemaal oké! Maar heb je dan iets gedaan voor een vriend, familielid, of als proef? Zelfs een kleine klus telt.";
-    if(kort) return "Geef even wat meer detail: wat deed je precies, en hoe reageerde diegene?";
-  }
-  if(q.id === "q11"){
-    if(kort || lower.includes("alles") || lower.includes("weet niet")) return "Wees hier eerlijk voor jezelf. Wat geeft je écht energie, en wat kost je meer dan het oplevert? Dat onderscheid is goud waard.";
-  }
-  if(q.id === "q17"){
-    if(kort || lower.includes("organiseren") || lower.includes("plannen") || lower.includes("communiceren")) return "Dit zijn woorden die bijna iedereen opschrijft. Wat is iets wat jij doet waarvan mensen om je heen zeggen 'hoe doe jij dat zo makkelijk'? Dat is de skill die we zoeken.";
-  }
-  if(q.id === "q25"){
-    if(kort || lower.includes("niet goed genoeg") || lower.includes("weet niet")) return "Probeer hier specifieker te zijn. Wat maakt je niet goed genoeg? Is het kennis, ervaring, zelfvertrouwen, of iets anders? Dat helpt me om die twijfel goed te weerleggen.";
-  }
-  if(q.id === "q32"){
-    if(kort || lower.includes("weet niet") || lower.includes("geen idee")) return "Er is echt iets wat jou stoort of opvalt in de branche waar je vandaan komt. Iets waarbij je denkt: dit kan zoveel beter, of: dit doe ik juist anders. Wat is dat?";
-  }
-
-  // Algemene vage signalen
-  if(lower.includes("ik ben goed in") && kort) return "Goed begin! Maar goed in wat precies? Geef een concreet voorbeeld van wanneer je dat liet zien.";
-  if(lower.includes("ik help graag") && kort) return "Fijn dat je dat weet! Maar wie help je het liefst, en met wat precies? Hoe specifieker, hoe sterker je kaart.";
-  if((lower === "nvt" || lower === "n.v.t." || lower === "-" || lower === "nee") ) return "Sla deze vraag niet over als je hem kunt invullen. Zelfs een klein voorbeeld is waardevol.";
-
-  return null;
-}
-
-function attachFeedback(container){
-  container.querySelectorAll("textarea").forEach(t => {
-    t.addEventListener("blur", () => {
-      const a = t.value.trim();
-      const qId = t.dataset.id;
-      const q = ALL.find(q => q.id === qId);
-      if(!q) return;
-      const feedback = getFeedback(q, a);
-      const existing = t.parentNode.querySelector(".live-feedback");
-      if(existing) existing.remove();
-      if(feedback){
-        const el = document.createElement("div");
-        el.className = "live-feedback";
-        el.style.cssText = "font-size:13px;color:var(--accent);font-weight:600;margin-top:7px;padding:8px 12px;background:#FFF8F0;border-radius:8px;border-left:3px solid var(--accent);";
-        el.textContent = feedback;
-        t.parentNode.appendChild(el);
-      }
-    });
-    // Verwijder feedback zodra ze weer gaan typen
-    t.addEventListener("focus", () => {
-      const existing = t.parentNode.querySelector(".live-feedback");
-      if(existing) existing.remove();
-    });
-  });
-}
-  const vaagSignalen = ["ik ben goed in","ik help graag","ik doe alles","van alles","algemeen","geen idee","weet ik niet","nvt","n.v.t.","-","..."];
-  const warnings = [];
-  ALL.forEach(q => {
-    const a = (state.answers[q.id]||"").trim().toLowerCase();
+function checkAndGenerate(){
+  var warnings = [];
+  ALL.forEach(function(q){
+    var a = (state.answers[q.id]||"").trim();
     if(!a) return;
-    const isVaag = vaagSignalen.some(s => a.includes(s)) || a.length < 20;
-    if(isVaag) warnings.push({ label: q.label, answer: state.answers[q.id] });
+    var feedback = getFeedback(q.id, a);
+    if(feedback) warnings.push({ label: q.label, answer: a, feedback: feedback });
   });
-  return warnings;
+  if(warnings.length > 0){
+    state.vaguWarnings = warnings;
+    state.phase = "vague";
+    render();
+  } else {
+    doGenerate();
+  }
 }
 
-function renderVague(warnings){
-  const items = warnings.map(w => `
-    <div style="background:#FFFBF4;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;padding:12px 14px;margin-bottom:10px;">
-      <div style="font-size:13px;font-weight:600;color:var(--ink);margin-bottom:4px;">${esc(w.label)}</div>
-      <div style="font-size:13px;color:var(--muted);font-style:italic;margin-bottom:8px;">Jouw antwoord: "${esc(w.answer)}"</div>
-      <div style="font-size:13px;color:var(--accent);font-weight:600;">${esc(w.feedback)}</div>
-    </div>`).join("");
-  app.innerHTML = `
-    <div class="card">
-      <div class="eyebrow">Even een check</div>
-      <h2 style="font-size:22px;margin:8px 0 12px;">Voordat ik je kaart maak...</h2>
-      <p style="color:var(--muted);font-size:14.5px;margin-bottom:20px;">Bij de volgende vragen is je antwoord nog wat kort of vaag. Een goede kaart heeft concreet bewijs. Wil je ze even aanvullen? Dat hoeft maar een paar zinnen te zijn.</p>
-      ${items}
-      <div class="row">
-        <button class="btn btn--ghost" id="backToForm">Terug om aan te vullen</button>
-        <button class="btn btn--primary" id="genAnyway">Genereer toch</button>
-      </div>
-    </div>`;
-  document.getElementById("backToForm").onclick = () => { state.si = SECTIONS.length - 1; render(); };
+function renderVague(){
+  var warnings = state.vaguWarnings || [];
+  var items = warnings.map(function(w){
+    return '<div style="background:#FFFBF4;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;padding:12px 14px;margin-bottom:10px;">'
+      + '<div style="font-size:13px;font-weight:600;color:var(--ink);margin-bottom:4px;">' + esc(w.label) + '</div>'
+      + '<div style="font-size:13px;color:var(--muted);font-style:italic;margin-bottom:8px;">Jouw antwoord: "' + esc(w.answer) + '"</div>'
+      + '<div style="font-size:13px;color:var(--accent);font-weight:600;">' + esc(w.feedback) + '</div>'
+      + '</div>';
+  }).join("");
+  app.innerHTML = '<div class="card">'
+    + '<div class="eyebrow">Even een check</div>'
+    + '<h2 style="font-size:22px;margin:8px 0 12px;">Voordat ik je kaart maak...</h2>'
+    + '<p style="color:var(--muted);font-size:14.5px;margin-bottom:20px;">Bij de volgende vragen kan je antwoord nog wat concreter. Een goede kaart heeft echt bewijs. Wil je ze even aanvullen? Een paar zinnen extra maakt al een groot verschil.</p>'
+    + items
+    + '<div class="row">'
+    + '<button class="btn btn--ghost" id="backToForm">Terug om aan te vullen</button>'
+    + '<button class="btn btn--primary" id="genAnyway">Genereer toch</button>'
+    + '</div></div>';
+  document.getElementById("backToForm").onclick = function(){ state.si = SECTIONS.length-1; state.phase = "form"; render(); };
   document.getElementById("genAnyway").onclick = doGenerate;
 }
 
-async function generate(){
-  const warnings = checkVague();
-  if(warnings.length > 0){
-    state.phase = "form";
-    renderVague(warnings);
-    return;
-  }
-  await doGenerate();
+function renderLoading(){
+  app.innerHTML = '<div class="card" style="text-align:center;">'
+    + '<div style="display:flex;gap:8px;justify-content:center;margin-bottom:18px;">'
+    + '<div class="dot"></div><div class="dot" style="animation-delay:.2s"></div><div class="dot" style="animation-delay:.4s"></div>'
+    + '</div>'
+    + '<h2 style="font-size:20px;margin-bottom:8px;">Je kracht wordt zwart op wit gezet...</h2>'
+    + '<p style="color:var(--muted);font-size:14px;">Even geduld, ik lees al je antwoorden en haal de rode draad eruit.</p>'
+    + '</div>';
 }
 
-async function doGenerate(){
+function renderError(){
+  app.innerHTML = '<div class="card">'
+    + '<h2 style="font-size:20px;margin-bottom:8px;">Er ging iets mis</h2>'
+    + '<p style="color:var(--muted);margin-bottom:18px;">Het lukte niet om je kaart te genereren. Probeer het opnieuw.</p>'
+    + '<button class="btn btn--primary" id="retry">Opnieuw proberen</button>'
+    + '</div>';
+  document.getElementById("retry").onclick = doGenerate;
+}
+
+function renderResult(){
+  var r = state.result || {};
+  var pills = (r.helptMet||[]).map(function(x){
+    return '<span style="background:var(--accentSoft);color:#3F0508;font-size:13.5px;font-weight:600;padding:7px 13px;border-radius:999px;">' + esc(x) + '</span>';
+  }).join("");
+  var proof = (r.bewijsmuur||[]).map(function(x){
+    return '<div style="background:#FFFBF4;border:1px solid var(--line);border-left:3px solid var(--primary);border-radius:8px;padding:10px 13px;font-size:14.5px;">' + esc(x) + '</div>';
+  }).join("");
+  app.innerHTML = '<div>'
+    + '<div class="card" style="border-top:5px solid var(--accent);">'
+    + '<div class="eyebrow">Jouw VA Kaart</div>'
+    + '<h1 style="font-size:26px;margin:10px 0 4px;color:var(--primary);">' + esc(r.krachtZin) + '</h1>'
+    + '<h3 style="font-size:16px;margin:26px 0 10px;">Ik help het beste met</h3>'
+    + '<div style="display:flex;flex-wrap:wrap;gap:8px;">' + pills + '</div>'
+    + '<h3 style="font-size:16px;margin:26px 0 10px;">Jouw bewijsmuur</h3>'
+    + '<div style="display:grid;gap:8px;">' + proof + '</div>'
+    + '<h3 style="font-size:16px;margin:26px 0 10px;">De twijfel die je vandaag loslaat</h3>'
+    + '<p style="font-size:14.5px;">' + esc(r.twijfelLoslaten) + '</p>'
+    + '</div>'
+    + '<div class="card" style="margin-top:16px;">'
+    + '<div class="eyebrow">Volgende stap</div>'
+    + '<h3 style="font-size:18px;margin:6px 0 8px;">De spiegel van anderen</h3>'
+    + '<p style="color:var(--muted);font-size:14.5px;margin-bottom:14px;">Anderen zien jouw kracht vaak nog scherper dan jij. Stuur dit appje naar 3 mensen die je goed kennen en eerlijk zijn. Neem hun antwoorden mee naar je gratis kennismakingsgesprek.</p>'
+    + '<div style="background:#FFFBF4;border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:14.5px;margin-bottom:14px;">' + esc(MIRROR_MSG) + '</div>'
+    + '<button class="btn btn--primary" id="copymsg">' + (state.copiedMsg ? "Gekopieerd!" : "Kopieer dit appje") + '</button>'
+    + '</div>'
+    + '<div class="card" style="margin-top:16px;background:var(--ink);border-color:var(--ink);">'
+    + '<div style="font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accentSoft);font-weight:700;">En nu?</div>'
+    + '<p style="color:#FDFDED;font-size:16px;margin:10px 0 20px;font-family:\'Fraunces\',serif;">' + esc(r.conclusie) + '</p>'
+    + '<a href="' + BOOKING_URL + '" target="_blank" rel="noreferrer" class="btn btn--accent">Plan je gratis kennismakingsgesprek</a>'
+    + '</div>'
+    + '<div class="row noprint">'
+    + '<button class="btn btn--ghost" id="copy">' + (state.copied ? "Gekopieerd!" : "Kopieer mijn kaart") + '</button>'
+    + '<button class="btn btn--ghost" id="print">Bewaar als pdf</button>'
+    + '<button class="btn btn--ghost" id="again">Opnieuw</button>'
+    + '</div></div>';
+
+  document.getElementById("copy").onclick = copyKaart;
+  document.getElementById("copymsg").onclick = copyMsg;
+  document.getElementById("print").onclick = function(){ window.print(); };
+  document.getElementById("again").onclick = function(){ state.phase="intro"; state.si=0; state.result=null; render(); };
+}
+
+function copyMsg(){
+  navigator.clipboard.writeText(MIRROR_MSG).then(function(){
+    state.copiedMsg = true; render();
+    setTimeout(function(){ state.copiedMsg = false; if(state.phase==="result") render(); }, 1800);
+  }).catch(function(){});
+}
+
+function doGenerate(){
   state.phase = "loading"; render();
-  const compiled = ALL.map(q => {
-    const a = (state.answers[q.id]||"").trim();
-    return a ? `Vraag: ${q.label}\nAntwoord: ${a}` : null;
+  var compiled = ALL.map(function(q){
+    var a = (state.answers[q.id]||"").trim();
+    return a ? "Vraag: " + q.label + "\nAntwoord: " + a : null;
   }).filter(Boolean).join("\n\n");
-  try{
-    const res = await fetch("/api/generate", {
-      method:"POST", headers:{"content-type":"application/json"},
-      body: JSON.stringify({ answers: compiled })
-    });
+
+  fetch("/api/generate", {
+    method:"POST",
+    headers:{"content-type":"application/json"},
+    body: JSON.stringify({ answers: compiled })
+  }).then(function(res){
     if(!res.ok) throw new Error("bad status");
-    const data = await res.json();
-    const clean = (data.text||"").replace(/```json/g,"").replace(/```/g,"").trim();
+    return res.json();
+  }).then(function(data){
+    var clean = (data.text||"").replace(/```json/g,"").replace(/```/g,"").trim();
     state.result = JSON.parse(clean);
     state.phase = "result"; render();
-  } catch(e){
+  }).catch(function(){
     state.phase = "error"; render();
-  }
+  });
 }
 
 function copyKaart(){
-  const r = state.result; if(!r) return;
-  const txt = `MIJN VA KAART\n\n${r.krachtZin}\n\nIk help het beste met:\n`
-    + (r.helptMet||[]).map(x=>`- ${x}`).join("\n")
-    + `\n\nMijn bewijsmuur:\n` + (r.bewijsmuur||[]).map(x=>`- ${x}`).join("\n")
-    + `\n\nDe twijfel die ik loslaat:\n${r.twijfelLoslaten}\n\n${r.conclusie}`;
-  navigator.clipboard.writeText(txt).then(() => {
+  var r = state.result; if(!r) return;
+  var txt = "MIJN VA KAART\n\n" + r.krachtZin + "\n\nIk help het beste met:\n"
+    + (r.helptMet||[]).map(function(x){ return "- " + x; }).join("\n")
+    + "\n\nMijn bewijsmuur:\n" + (r.bewijsmuur||[]).map(function(x){ return "- " + x; }).join("\n")
+    + "\n\nDe twijfel die ik loslaat:\n" + r.twijfelLoslaten + "\n\n" + r.conclusie;
+  navigator.clipboard.writeText(txt).then(function(){
     state.copied = true; render();
-    setTimeout(() => { state.copied = false; if(state.phase==="result") render(); }, 1800);
-  }).catch(()=>{});
+    setTimeout(function(){ state.copied = false; if(state.phase==="result") render(); }, 1800);
+  }).catch(function(){});
 }
 
 render();
