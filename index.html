@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Jij kunt meer dan je verkoopt — VA Kaart</title>
+<title>Jij kunt meer dan je verkoopt - VA Kaart</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Open+Sans:wght@400;500;600;700&display=swap');
 
@@ -16,7 +16,7 @@
 *{box-sizing:border-box;}
 body{margin:0;font-family:'Open Sans',-apple-system,'Segoe UI',sans-serif;color:var(--ink);
   background:var(--bg);line-height:1.6;-webkit-font-smoothing:antialiased;padding:28px 18px 56px;}
-h1,h2,h3{font-family:'Fraunces',Georgia,serif;font-weight:600;line-height:1.15;margin:0;}
+h1,h2,h3,.serif{font-family:'Fraunces',Georgia,serif;font-weight:600;line-height:1.15;margin:0;}
 p{margin:0;}
 .wrap{max-width:640px;margin:0 auto;}
 .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:26px 24px;}
@@ -40,149 +40,168 @@ textarea:focus{border-color:var(--primary2);box-shadow:0 0 0 3px rgba(63,5,8,.16
 .progress > div{height:6px;background:var(--accent);border-radius:999px;transition:width .3s;}
 @keyframes pulse{0%,100%{opacity:.35}50%{opacity:1}}
 .dot{width:9px;height:9px;border-radius:50%;background:var(--primary);animation:pulse 1.1s ease-in-out infinite;}
+
+.legend{font-size:13px;color:var(--muted);margin-bottom:14px;}
+.taskrow{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:10px 0;border-bottom:1px solid var(--line);}
+.taskname{font-size:14.5px;font-weight:600;flex:1 1 220px;}
+.chips{display:flex;gap:6px;flex-wrap:wrap;}
+.chip{font-family:inherit;font-size:12.5px;font-weight:600;border-radius:999px;padding:6px 12px;
+  background:#FFFBF4;color:var(--primary);border:1px solid var(--line);cursor:pointer;}
+.chip.on.chip-done{background:var(--primary);color:#FDFDED;border-color:var(--primary);}
+.chip.on.chip-energy{background:var(--accent);color:#3F0508;border-color:var(--accent);}
+.chip.on.chip-drain{background:var(--accentSoft);color:#3F0508;border-color:var(--accentSoft);}
+
 @media print{.noprint{display:none!important;}}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div style="text-align:center;margin-bottom:22px;">
-    <div style="font-family:'Fraunces',serif;font-weight:600;font-size:18px;color:var(--primary);">Anna Marijn</div>
+    <div class="serif" style="font-size:18px;color:var(--primary);">Anna Marijn</div>
     <div style="font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-top:2px;">Virtual Assistant Coach</div>
   </div>
   <div id="app"></div>
 </div>
 
 <script>
-const BOOKING_URL = "https://tidycal.com/loyalvacoaching/kennismaking";
-const MIRROR_MSG = "Hey! Ik ben bezig met een oefening voor mijn VA-bedrijf en ik heb jouw eerlijke mening nodig. Kun je me vertellen: 1) Waarvoor bel of app je mij als je ergens niet uitkomt? 2) Wat zou jij zeggen als je mij aan iemand anders zou omschrijven? \u2764\uFE0F";
+var BOOKING_URL = "https://tidycal.com/loyalvacoaching/kennismaking";
+var MIRROR_MSG = "Hey! Ik ben bezig met een oefening voor mijn VA-bedrijf en ik heb jouw eerlijke mening nodig. Kun je me vertellen: 1) Waarvoor bel of app je mij als je ergens niet uitkomt? 2) Wat zou jij zeggen als je mij aan iemand anders zou omschrijven? \u2764\uFE0F";
+var MIN_ANSWERS = 8;
 
-const SECTIONS = [
+var TASKS = [
+  { id:"t1",  label:"E-mail en agenda beheren" },
+  { id:"t2",  label:"Administratie en facturatie" },
+  { id:"t3",  label:"Boekhouding voorbereiden" },
+  { id:"t4",  label:"Social media plannen en posten" },
+  { id:"t5",  label:"Teksten schrijven (blogs, nieuwsbrieven, mails)" },
+  { id:"t6",  label:"Website bijhouden en aanpassen" },
+  { id:"t7",  label:"Systemen inrichten (CRM, MailBlue, Notion, Trello)" },
+  { id:"t8",  label:"Automatiseringen bouwen (Zapier, Make)" },
+  { id:"t9",  label:"Projecten bewaken en opvolgen" },
+  { id:"t10", label:"Klantenservice en inbox beantwoorden" },
+  { id:"t11", label:"Online cursus of lancering ondersteunen" },
+  { id:"t12", label:"Webinars en events organiseren" },
+  { id:"t13", label:"Reizen en afspraken regelen" },
+  { id:"t14", label:"Recruitment en onboarding" },
+  { id:"t15", label:"Rapportages en cijfers bijhouden" },
+  { id:"t16", label:"Designwerk in Canva" },
+  { id:"t17", label:"Video of podcast bewerken" },
+  { id:"t18", label:"Onderzoek doen en dingen uitzoeken" },
+  { id:"t19", label:"Offertes en contracten opstellen" },
+  { id:"t20", label:"Dossiers en documenten ordenen" }
+];
+
+var SECTIONS = [
   {
-    title: "Wat anderen al lang in jou zien",
-    intro: "We beginnen niet bij jou, maar bij de mensen om je heen. Anderen zien jou vaak veel helderder dan jij jezelf ziet. Dit zijn je blinde vlekken: dingen die voor jou vanzelfsprekend zijn, maar voor anderen goud waard. Wees eerlijk en concreet: geen 'ik ben communicatief sterk', maar een echt voorbeeld.",
+    title: "Jouw klantwerk",
+    intro: "Je bent al gestart, dus je hebt echte gegevens. Daar beginnen we, want je klantwerk laat zien waar je nu al waarde levert. Wees concreet: wie was de klant, wat deed je precies, wat was het resultaat?",
     qs: [
-      { id:"q1", label:"Waar vragen mensen jou altijd om hulp, ook buiten werk, ook privé? Noem minimaal 2 concrete voorbeelden.", hint:"Denk aan: 'Mijn vriendinnen vragen altijd of ik hun mailbox wil bekijken' of 'Op werk kwamen ze altijd bij mij voor de planning.'" },
-      { id:"q2", label:"Wat zeiden collega's, leidinggevenden of klanten dat jij goed deed, terwijl jij dacht 'maar dat is toch normaal'?", hint:"Als je denkt 'dat kan iedereen', stop dan. Dat is precies het antwoord dat we zoeken." },
-      { id:"q3", label:"Als je beste vriendin jou zou omschrijven aan een ondernemer die hulp zoekt, wat zou ze concreet zeggen? Schrijf het op alsof zij het zegt." },
-      { id:"q4", label:"Wat wuif jij weg als iemand je een compliment geeft?", hint:"'Ach, dat stelde niks voor.' Wat stelde het dan wel voor? Dat is je blinde vlek." }
+      { id:"k1", label:"Welke klussen heb je tot nu toe voor klanten gedaan? Noem per klus voor wie het was (type ondernemer of branche) en wat je precies deed.", big:true },
+      { id:"k2", label:"Welke klus kwam het vaakst terug, of werd je het vaakst voor gevraagd?" },
+      { id:"k3", label:"Wie was je favoriete klant, en wat maakte die samenwerking zo goed?", hint:"Denk aan het type ondernemer, het soort werk en hoe jullie samenwerkten." },
+      { id:"k4", label:"Welke reactie of welk compliment van een klant is je het meest bijgebleven? Wat had je toen gedaan?" },
+      { id:"k5", label:"Waar zeg je nu ja op, terwijl je eigenlijk liever nee zou zeggen?", hint:"Wat je aanneemt maar niet leuk vindt, zegt net zoveel als wat je graag doet." }
     ]
   },
   {
-    title: "De goudmijn uit je loondienst",
-    intro: "Je jaren in loondienst zijn geen bijzaak: het is bewijs dat je al lang doet wat ondernemers hard nodig hebben. We gaan die ervaring nu omzetten naar waarde. Wees specifiek: sector, taken, aantallen, resultaten. Vage antwoorden als 'ik deed administratie' zijn niet genoeg. Wat deed je precies?",
+    title: "Wat je doet en wat je energie geeft",
+    intro: "Herkennen is makkelijker dan bedenken. Loop de lijst langs en vink per taak aan wat voor jou geldt. Je mag meerdere dingen per taak aanvinken.",
+    tasks: true,
+    qs: []
+  },
+  {
+    title: "Je achtergrond als voorsprong",
+    intro: "Je jaren in loondienst zijn geen bijzaak. Wie een branche van binnen kent, hoeft niet uitgelegd te krijgen hoe het daar werkt. Dat is vaak je snelste weg naar een specialisatie.",
     qs: [
-      { id:"q5", label:"Welke taken deed jij moeiteloos, terwijl collega's er tegenop zagen of er veel langer over deden? Geef een concreet voorbeeld." },
-      { id:"q6", label:"Voor welke vragen of problemen kwamen mensen eerst bij jou? Wat maakte jou de aangewezen persoon daarvoor?" },
-      { id:"q7", label:"Beschrijf een moment waarop iets dankzij jou goed liep. Wat was de situatie, wat deed jij precies, en wat was het resultaat?", hint:"'Ik heb eens een hele planning omgegooid toen een collega uitviel, zodat de klant er niets van merkte.' Zo concreet mag het zijn." },
-      { id:"q8", label:"In welke sector of branche heb je gewerkt, hoeveel jaar, en wat waren je belangrijkste verantwoordelijkheden?" }
+      { id:"b1", label:"In welke branche of sector heb je gewerkt, hoeveel jaar, en wat deed je daar precies?" },
+      { id:"b2", label:"Met welke systemen, programma's en tools heb je daar gewerkt?", hint:"Noem alles, ook interne systemen of branchesoftware. Kennis van een specifiek systeem is vaak een directe niche." },
+      { id:"b3", label:"Wat ging er in die branche steeds fout, of kostte mensen onnodig veel tijd, terwijl jij wist hoe het beter kon?" },
+      { id:"b4", label:"Welk type ondernemer begrijp jij het beste, en waarom?", hint:"Bijvoorbeeld een coach, een zzp'er in de zorg, een webshop of een praktijk." }
     ]
   },
   {
-    title: "Wat jij al doet, ook zonder betaalde klanten",
-    intro: "Je hoeft nog geen factuur te hebben gestuurd om bewijs te hebben van je kracht. Kijk verder dan 'officieel werk'. Heb je iets geregeld voor een vriend, familie, een vrijwilligersproject, of als proef? Dat telt allemaal. Wees eerlijk, ook kleine dingen zijn relevant.",
+    title: "Wat anderen in jou zien",
+    intro: "Anderen zien jou vaak scherper dan jij jezelf ziet. Wat voor jou vanzelfsprekend is, is voor een ander soms goud waard.",
     qs: [
-      { id:"q9", label:"Heb je al iets gedaan voor een ondernemer, bekende of in een proefproject, hoe klein ook? Wat deed je precies en wat was de reactie?" },
-      { id:"q10", label:"Wat deed jij voor iemand waarbij diegene zei 'oh fijn, hier had ik zelf uren over gedaan'? Ook in privésituaties.", hint:"Een agenda bijhouden, een tekst nakijken, een evenement organiseren: alles telt." },
-      { id:"q11", label:"Welke VA-taken trekken je aan en welke absoluut niet? Schrijf eerlijk op wat je energie geeft en wat je liever vermijdt." },
-      { id:"q12", label:"Als je morgen je eerste klant mocht kiezen: wie is dat, en wat doe je precies voor haar of hem?", hint:"Geen goed of fout antwoord, gewoon je eerste eerlijke gevoel." }
+      { id:"a1", label:"Waar vragen mensen jou altijd om hulp, ook buiten werk? Geef een concreet voorbeeld.", hint:"Bijvoorbeeld: 'Mijn vriendinnen vragen altijd of ik hun mailbox wil opruimen.'" },
+      { id:"a2", label:"Wat zeiden collega's, leidinggevenden of klanten dat jij goed deed, terwijl jij dacht 'maar dat is toch normaal'?" },
+      { id:"a3", label:"Wat wuif jij weg als iemand je een compliment geeft?", hint:"'Ach, dat stelde niks voor.' Wat stelde het dan wel voor?" }
     ]
   },
   {
-    title: "Energie als kompas",
-    intro: "Energie liegt nooit. Wat jou energie geeft, is bijna altijd ook iets wat je goed doet en waar klanten voor willen betalen. Dit onderdeel gaat niet over wat je 'zou moeten' aanbieden, maar over wat je echt trekt. Wees eerlijk, ook als het antwoord je verrast.",
+    title: "Jouw visie",
+    intro: "Wie een sterke mening heeft over haar vak, valt op tussen de andere VA's. Hier ontdek je wat jij anders doet of anders ziet.",
     qs: [
-      { id:"q13", label:"Welke taken doe jij als eerste, gewoon omdat je er zin in hebt, ook al staan ze niet op je to-do lijst?" },
-      { id:"q14", label:"Waarbij verlies jij het gevoel voor tijd?", hint:"Ook buiten werk: een hobby, een gesprek, een klus. Als je vergeet te eten, zit je waarschijnlijk in je kracht." },
-      { id:"q15", label:"Wat doe je in je vrije tijd dat eigenlijk professionele waarde heeft, maar wat je geen 'echt werk' noemt?" },
-      { id:"q16", label:"Als je vanaf morgen nog maar één soort klus mag doen voor klanten, welke kies je, en waarom die?" }
+      { id:"v1", label:"Wat is iets in jouw vakgebied of branche waar jij een sterke mening over hebt?", hint:"Denk aan de sector waar je vandaan komt. Wat zie je daar dat anderen fout doen, of wat doe jij juist anders?" },
+      { id:"v2", label:"Wat zie je andere VA's doen waarvan je denkt: dit doe ik juist anders?" }
     ]
   },
   {
-    title: "De verborgen expertise blootleggen",
-    intro: "Achter 'maar dat kan toch iedereen?' zit bijna altijd een skill die anderen niet hebben. Dit onderdeel gaat over wat jij weet maar onderschat. We gaan het nu benoemen: concreet, zonder wegwuiven.",
+    title: "Bewijs en twijfel",
+    intro: "Dit is het laatste deel. We zetten je bewijs op een rij en kijken eerlijk naar wat je nog tegenhoudt. Geen sugarcoating, want eerlijkheid brengt je verder dan geruststelling.",
     qs: [
-      { id:"q17", label:"Wat vind jij zo vanzelfsprekend dat je het nooit een skill zou noemen? Noem minimaal 3 dingen." },
-      { id:"q18", label:"Wat kunnen anderen aantoonbaar slecht of langzaam, terwijl jij het moeiteloos doet?" },
-      { id:"q19", label:"Waar worden mensen zenuwachtig of gestrest van, terwijl jij er rustig onder blijft? Wat doe jij dan dat zij niet doen?" },
-      { id:"q20", label:"Welke kennis, tool of vaardigheid heb jij opgedaan, in loondienst of daarbuiten, die een ondernemer nu meteen kan gebruiken?" }
-    ]
-  },
-  {
-    title: "De twijfel recht in de ogen",
-    intro: "Bijna elke VA twijfelt: niet omdat ze niet goed genoeg is, maar omdat ze zichzelf vergelijkt. Of omdat ze wacht tot ze 'klaar' is. Hier kijken we die twijfel recht in de ogen. Geen sugarcoating: eerlijkheid brengt je verder dan geruststelling.",
-    qs: [
-      { id:"q25", label:"Wat houdt jou nu concreet tegen om jezelf als VA aan te bieden of je tarieven te noemen?", hint:"'Ik ben niet goed genoeg' is geen antwoord. Wat maakt jou niet goed genoeg? Wees specifiek." },
-      { id:"q26", label:"Met wie vergelijk jij jezelf, en waarom denk je dat zij meer waard zijn dan jij?" },
-      { id:"q27", label:"Als een vriendin met exact jouw achtergrond en ervaring vroeg 'ben ik goed genoeg om VA te zijn?', wat zou jij letterlijk tegen haar zeggen?" },
-      { id:"q28", label:"Is jouw twijfel een feit of een aanname? Zoek in je antwoorden hierboven naar bewijs dat haar tegenspreekt." }
-    ]
-  },
-  {
-    title: "Jouw bewijsmuur, alles op een rij",
-    intro: "Dit is het laatste onderdeel. We gaan nu alles wat je hebt opgeschreven samenvatten tot concreet bewijs. Groot of klein, betaald of onbetaald, privé of werk: alles telt mee.",
-    qs: [
-      { id:"lijst10", label:"Schrijf de laatste 5 dingen op die jij voor iemand anders hebt geregeld, gemaakt of opgelost.", hint:"Eén per regel. Agenda plannen, mail nalezen, iets uitzoeken, conflict oplossen, presentatie maken: alles telt.", big:true },
-      { id:"q29", label:"Welke taken doe jij telkens opnieuw, voor verschillende mensen? Dat patroon is geen toeval, dat is jouw kracht." },
-      { id:"q30", label:"Noem 3 concrete momenten waarop iemand blij, opgelucht of dankbaar was dankzij iets wat jij deed." },
-      { id:"q31", label:"Heb je ooit iemand aantoonbaar geld, tijd of stress bespaard? Beschrijf wat je deed en wat het opleverde." },
-      { id:"q32", label:"Wat is iets in jouw vakgebied of branche waar jij een sterke mening over hebt?", hint:"Denk aan de sector waar jij vandaan komt: HR, zorg, onderwijs, retail, administratie, noem maar op. Wat zie jij daar wat anderen fout doen, of wat doe jij juist anders? Dat is je visie, en die maakt je onvergetelijk." }
+      { id:"t1a", label:"Wat is je grootste prestatie voor een klant tot nu toe? Wat was de situatie, wat deed jij, en wat was het resultaat?", big:true },
+      { id:"t2a", label:"Wat zeg je nu als iemand vraagt wat je doet? Schrijf het letterlijk op.", hint:"Lees het daarna terug. Voelt het scherp, of vaag?" },
+      { id:"t3a", label:"Wat denk je dat de reden is dat klanten (nog) niet vanzelf voor jou kiezen, of dat je agenda nog niet vol zit?" },
+      { id:"t4a", label:"Wat houdt je tegen om duidelijker te kiezen, je tarief te verhogen of nee te zeggen? Wees specifiek.", hint:"'Ik ben niet goed genoeg' is geen antwoord. Wat precies?" },
+      { id:"t5a", label:"Als een vriendin met jouw ervaring vroeg 'ben ik goed genoeg om dit als bedrijf te doen?', wat zou jij letterlijk tegen haar zeggen?" }
     ]
   }
 ];
 
-const ALL = SECTIONS.flatMap(function(s){ return s.qs; });
-const state = { phase:"intro", si:0, answers:{}, result:null, copied:false, copiedMsg:false };
-const app = document.getElementById("app");
+var ALL = [];
+SECTIONS.forEach(function(s){ s.qs.forEach(function(q){ ALL.push(q); }); });
 
-function esc(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+var state = { phase:"intro", si:0, answers:{}, tasks:{}, result:null, vaguWarnings:[], copied:false, copiedMsg:false };
+var app = document.getElementById("app");
+
+function esc(s){ return String(s == null ? "" : s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 function answered(){ return ALL.filter(function(q){ return (state.answers[q.id]||"").trim(); }).length; }
 
+var KORT_FEEDBACK = {
+  k1: "Noem per klus wie de klant was (welke branche of welk type ondernemer) en wat je precies deed. Daar bouwen we je specialisatie op.",
+  k2: "Welke klus kwam het vaakst terug? Een patroon in je klantwerk is vaak je eerste aanwijzing voor een specialisatie.",
+  k3: "Wat maakte dit je favoriete klant? Denk aan het type ondernemer, het soort werk en hoe jullie samenwerkten.",
+  k4: "Wat zei de klant precies, of wat gebeurde er? Hoe letterlijker, hoe beter.",
+  k5: "Wees hier eerlijk. Wat je nu aanneemt maar niet leuk vindt, is minstens zo belangrijk als wat je graag doet.",
+  b1: "Noem de branche, hoeveel jaar en wat je daar precies deed. Je achtergrond is vaak je grootste voorsprong.",
+  b2: "Noem zoveel mogelijk programma's en systemen. Kennis van een specifiek systeem is vaak een directe niche.",
+  b3: "Denk aan irritaties en fouten die jij steeds zag. Daar zit meestal je visie en je specialisatie.",
+  b4: "Welk type ondernemer begrijp jij het snelst, en waarom? Denk aan een echte klant of iemand die je kent.",
+  a1: "Noem een echt voorbeeld: wie vroeg je om hulp, en waarmee precies?",
+  a2: "Wat zei die collega of leidinggevende echt? Hoe concreter, hoe beter je kaart wordt.",
+  a3: "Wat wuifde je weg, en wat had je toen eigenlijk gedaan? Dat is vaak je blinde vlek.",
+  v1: "Er is echt iets wat jou stoort of opvalt in de branche waar je vandaan komt. Iets waarbij je denkt: dit kan zoveel beter. Wat is dat?",
+  v2: "Denk aan iets wat je vaak ziet bij andere VA's en waar jij anders over denkt. Dat verschil maakt je herkenbaar.",
+  t1a: "Dit is een van de krachtigste vragen. Wat was de situatie, wat deed jij, en wat was het resultaat?",
+  t2a: "Schrijf het echt letterlijk op, zoals je het nu tegen iemand zou zeggen. Dan zien we samen of het scherp genoeg is.",
+  t3a: "Wees eerlijk. Wat denk jij dat een klant ziet, of juist niet ziet, als hij naar jou kijkt?",
+  t4a: "Probeer specifieker te zijn. Is het kennis, ervaring, zelfvertrouwen, of iets anders? Dat helpt om de twijfel goed te weerleggen.",
+  t5a: "Doe eens alsof je het echt tegen een vriendin zegt. Wat zou je haar vertellen?"
+};
+
 function getFeedback(qId, a){
-  var s = (a||"").trim();
+  var s = (a || "").trim();
   if(!s) return null;
   var low = s.toLowerCase();
-  var kort = s.length < 25;
-
-  if(qId === "q1"){
-    if(kort || low.indexOf("van alles") > -1) return "Mooi dat je dit noemt! Kun je een concreet voorbeeld geven? Wie vroeg je precies om hulp, en waarmee?";
+  if(low === "nvt" || low === "n.v.t." || low === "-" || low === "nee" || low === "geen idee" || low === "weet ik niet"){
+    return "Sla deze vraag niet over als je hem kunt invullen. Zelfs een klein voorbeeld is waardevol.";
   }
-  if(qId === "q2"){
-    if(kort || low.indexOf("communicatie") > -1 || low.indexOf("proactief") > -1) return "Dit zijn woorden die heel veel VA's gebruiken. Wat zei die collega of leidinggevende echt? Hoe concreter, hoe beter je kaart wordt.";
+  if(s.length < 30) return KORT_FEEDBACK[qId] || "Schrijf hier iets meer over: wie, wat precies, en wat was het resultaat?";
+  var vaag = ["van alles","alles een beetje","ik ben goed in","ik help graag","communicatief sterk","proactief"];
+  for(var i = 0; i < vaag.length; i++){
+    if(low.indexOf(vaag[i]) > -1 && s.length < 80){
+      return "Dit zijn woorden die bijna elke VA gebruikt. Wat gebeurde er precies, en wat deed jij? Geef een concreet voorbeeld.";
+    }
   }
-  if(qId === "q3"){
-    if(kort) return "Doe eens alsof je vriendin het echt uitspreekt. Hoe klinkt dat? Schrijf het op in haar woorden.";
-  }
-  if(qId === "q5"){
-    if(kort || low.indexOf("administratie") > -1 || low.indexOf("alles") > -1) return "Goed begin! Maar wat deed je dan precies? 'Administratie' kan van alles zijn. Geef een concreet voorbeeld van een taak die jij makkelijk afhandelde.";
-  }
-  if(qId === "q7"){
-    if(kort) return "Dit is een van de krachtigste vragen. Denk aan een echt moment: wat was er aan de hand, wat deed jij, en wat was het resultaat?";
-  }
-  if(qId === "q9"){
-    if(low === "nee" || low.indexOf("nog niet") > -1 || low.indexOf("nvt") > -1 || low === "n.v.t.") return "Geen betaalde klanten is helemaal oké! Maar heb je dan iets gedaan voor een vriend, familielid, of als proef? Zelfs een kleine klus telt.";
-    if(kort) return "Geef even wat meer detail: wat deed je precies, en hoe reageerde diegene?";
-  }
-  if(qId === "q17"){
-    if(kort || low.indexOf("organiseren") > -1 || low.indexOf("plannen") > -1 || low.indexOf("communiceren") > -1) return "Dit zijn woorden die bijna iedereen opschrijft. Wat is iets wat jij doet waarvan mensen zeggen 'hoe doe jij dat zo makkelijk'? Dat is de skill die we zoeken.";
-  }
-  if(qId === "q25"){
-    if(kort || low.indexOf("niet goed genoeg") > -1) return "Probeer hier specifieker te zijn. Wat maakt je niet goed genoeg? Is het kennis, ervaring, zelfvertrouwen, of iets anders? Dat helpt me om die twijfel goed te weerleggen.";
-  }
-  if(qId === "q32"){
-    if(kort || low.indexOf("weet niet") > -1 || low.indexOf("geen idee") > -1) return "Er is echt iets wat jou stoort of opvalt in de branche waar je vandaan komt. Iets waarbij je denkt: dit kan zoveel beter, of: dit doe ik juist anders. Wat is dat?";
-  }
-  if((low.indexOf("ik ben goed in") > -1) && kort) return "Goed begin! Maar goed in wat precies? Geef een concreet voorbeeld van wanneer je dat liet zien.";
-  if((low.indexOf("ik help graag") > -1) && kort) return "Fijn dat je dat weet! Maar wie help je het liefst, en met wat precies? Hoe specifieker, hoe sterker je kaart.";
-  if(low === "nvt" || low === "n.v.t." || low === "-" || low === "nee") return "Sla deze vraag niet over als je hem kunt invullen. Zelfs een klein voorbeeld is waardevol.";
   return null;
 }
 
 function attachFeedback(container){
   container.querySelectorAll("textarea").forEach(function(t){
     t.addEventListener("blur", function(){
-      var a = t.value.trim();
-      var qId = t.dataset.id;
-      var feedback = getFeedback(qId, a);
+      var feedback = getFeedback(t.dataset.id, t.value);
       var existing = t.parentNode.querySelector(".live-feedback");
       if(existing) existing.remove();
       if(feedback){
@@ -212,41 +231,59 @@ function renderIntro(){
   app.innerHTML = '<div class="card">'
     + '<div class="eyebrow">Werkblad</div>'
     + '<h1 style="font-size:30px;margin:8px 0 14px;">Jij kunt meer dan je verkoopt</h1>'
-    + '<p style="color:var(--muted);margin-bottom:16px;">Je kunt je werk goed. Maar als iemand vraagt wat je precies doet, hoor je jezelf iets vaags zeggen. Het probleem is niet dat jij niets bijzonders kunt. Je vindt je kracht zo vanzelfsprekend dat je hem zelf niet meer ziet. Dit werkblad helpt je hem terug te vinden: zwart op wit, met bewijs.</p>'
-    + '<p style="font-size:14px;color:var(--muted);margin-bottom:22px;">7 korte delen, ongeveer een half uur. Je antwoorden blijven op dit scherm. Aan het eind krijg je je persoonlijke VA Kaart.</p>'
+    + '<p style="color:var(--muted);margin-bottom:16px;">Je bent gestart als VA en je hebt al klanten gehad. Je kunt je werk goed, maar als iemand vraagt wat je precies doet, hoor je jezelf iets vaags zeggen. Het probleem is niet dat jij niets bijzonders kunt. Je vindt je kracht zo vanzelfsprekend dat je hem zelf niet meer ziet. Dit werkblad gebruikt je eigen klantwerk om te laten zien waar je het verschil maakt.</p>'
+    + '<p style="font-size:14px;color:var(--muted);margin-bottom:22px;">6 korte delen, ongeveer een half uur. Hoe concreter je antwoorden, hoe scherper je kaart. Je antwoorden blijven op dit scherm. Aan het eind krijg je je persoonlijke VA Kaart met twee mogelijke specialisaties.</p>'
     + '<button class="btn btn--primary" id="start">Start het werkblad</button>'
     + '</div>';
-  document.getElementById("start").onclick = function(){ state.phase="form"; render(); };
+  document.getElementById("start").onclick = function(){ state.phase = "form"; render(); };
+}
+
+function chip(id, k, label, on){
+  return '<button type="button" class="chip chip-' + k + (on ? ' on' : '') + '" data-t="' + id + '" data-k="' + k + '">' + label + '</button>';
+}
+
+function renderTasks(){
+  var rows = TASKS.map(function(t){
+    var s = state.tasks[t.id] || {};
+    return '<div class="taskrow"><div class="taskname">' + esc(t.label) + '</div><div class="chips">'
+      + chip(t.id, "done", "Gedaan", s.done)
+      + chip(t.id, "energy", "Geeft energie", s.energy)
+      + chip(t.id, "drain", "Kost energie", s.drain)
+      + '</div></div>';
+  }).join("");
+  return '<div class="legend">Gedaan = je hebt dit voor een klant gedaan. Geeft energie = je doet dit het liefst. Kost energie = je kunt het wel, maar het put je uit.</div>' + rows;
 }
 
 function renderForm(){
   var sec = SECTIONS[state.si];
-  var qsHtml = sec.qs.map(function(q){
+  var body = "";
+  if(sec.tasks) body += renderTasks();
+  body += sec.qs.map(function(q){
     return '<div style="margin-bottom:20px;">'
       + '<div class="q">' + esc(q.label) + '</div>'
       + (q.hint ? '<div class="hint">' + esc(q.hint) + '</div>' : '')
-      + '<textarea data-id="' + q.id + '" placeholder="Jouw antwoord..." style="' + (q.big ? 'min-height:130px;' : '') + '">' + esc(state.answers[q.id]||"") + '</textarea>'
+      + '<textarea data-id="' + q.id + '" placeholder="Jouw antwoord..." style="' + (q.big ? 'min-height:130px;' : '') + '">' + esc(state.answers[q.id] || "") + '</textarea>'
       + '</div>';
   }).join("");
 
   var last = state.si === SECTIONS.length - 1;
   app.innerHTML = '<div class="noprint" style="margin-bottom:16px;">'
     + '<div style="display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:6px;">'
-    + '<span>Deel ' + (state.si+1) + ' van ' + SECTIONS.length + '</span>'
+    + '<span>Deel ' + (state.si + 1) + ' van ' + SECTIONS.length + '</span>'
     + '<span id="counter">' + answered() + ' vragen ingevuld</span></div>'
-    + '<div class="progress"><div style="width:' + (((state.si+1)/SECTIONS.length)*100) + '%"></div></div>'
+    + '<div class="progress"><div style="width:' + (((state.si + 1) / SECTIONS.length) * 100) + '%"></div></div>'
     + '</div>'
     + '<div class="card">'
-    + '<div class="eyebrow">Deel ' + (state.si+1) + '</div>'
+    + '<div class="eyebrow">Deel ' + (state.si + 1) + '</div>'
     + '<h2 style="font-size:23px;margin:6px 0 10px;">' + esc(sec.title) + '</h2>'
     + '<p style="color:var(--muted);font-size:14.5px;margin-bottom:22px;">' + esc(sec.intro) + '</p>'
-    + qsHtml
+    + body
     + '</div>'
     + '<div class="row noprint">'
     + (state.si > 0 ? '<button class="btn btn--ghost" id="back">Terug</button>' : '')
     + (!last ? '<button class="btn btn--primary" id="next">Volgende deel</button>' : '')
-    + (last ? '<button class="btn btn--primary" id="gen" ' + (answered()<5?"disabled":"") + '>Genereer mijn VA Kaart</button>' : '')
-    + (last && answered()<5 ? '<span style="font-size:13px;color:var(--muted);">Vul het liefst alle vragen in, dat geeft de beste kaart.</span>' : '')
+    + (last ? '<button class="btn btn--primary" id="gen" ' + (answered() < MIN_ANSWERS ? "disabled" : "") + '>Genereer mijn VA Kaart</button>' : '')
+    + (last && answered() < MIN_ANSWERS ? '<span style="font-size:13px;color:var(--muted);">Vul minstens ' + MIN_ANSWERS + ' vragen in. Hoe meer, hoe scherper je kaart.</span>' : '')
     + '</div>';
 
   app.querySelectorAll("textarea").forEach(function(t){
@@ -254,8 +291,18 @@ function renderForm(){
       state.answers[e.target.dataset.id] = e.target.value;
       var counter = document.getElementById("counter");
       if(counter) counter.textContent = answered() + " vragen ingevuld";
-      var gen = document.getElementById("gen");
-      if(gen) gen.disabled = answered() < 5;
+      var g = document.getElementById("gen");
+      if(g) g.disabled = answered() < MIN_ANSWERS;
+    });
+  });
+
+  app.querySelectorAll(".chip").forEach(function(b){
+    b.addEventListener("click", function(){
+      var id = b.dataset.t;
+      var k = b.dataset.k;
+      if(!state.tasks[id]) state.tasks[id] = {};
+      state.tasks[id][k] = !state.tasks[id][k];
+      b.classList.toggle("on");
     });
   });
 
@@ -272,7 +319,7 @@ function renderForm(){
 function checkAndGenerate(){
   var warnings = [];
   ALL.forEach(function(q){
-    var a = (state.answers[q.id]||"").trim();
+    var a = (state.answers[q.id] || "").trim();
     if(!a) return;
     var feedback = getFeedback(q.id, a);
     if(feedback) warnings.push({ label: q.label, answer: a, feedback: feedback });
@@ -287,8 +334,7 @@ function checkAndGenerate(){
 }
 
 function renderVague(){
-  var warnings = state.vaguWarnings || [];
-  var items = warnings.map(function(w){
+  var items = (state.vaguWarnings || []).map(function(w){
     return '<div style="background:#FFFBF4;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;padding:12px 14px;margin-bottom:10px;">'
       + '<div style="font-size:13px;font-weight:600;color:var(--ink);margin-bottom:4px;">' + esc(w.label) + '</div>'
       + '<div style="font-size:13px;color:var(--muted);font-style:italic;margin-bottom:8px;">Jouw antwoord: "' + esc(w.answer) + '"</div>'
@@ -298,13 +344,13 @@ function renderVague(){
   app.innerHTML = '<div class="card">'
     + '<div class="eyebrow">Even een check</div>'
     + '<h2 style="font-size:22px;margin:8px 0 12px;">Voordat ik je kaart maak...</h2>'
-    + '<p style="color:var(--muted);font-size:14.5px;margin-bottom:20px;">Bij de volgende vragen kan je antwoord nog wat concreter. Een goede kaart heeft echt bewijs. Wil je ze even aanvullen? Een paar zinnen extra maakt al een groot verschil.</p>'
+    + '<p style="color:var(--muted);font-size:14.5px;margin-bottom:20px;">Bij deze vragen kan je antwoord nog concreter. Een goede kaart heeft echt bewijs nodig. Wil je ze nog even aanvullen? Een paar zinnen extra maakt een groot verschil.</p>'
     + items
     + '<div class="row">'
     + '<button class="btn btn--ghost" id="backToForm">Terug om aan te vullen</button>'
     + '<button class="btn btn--primary" id="genAnyway">Genereer toch</button>'
     + '</div></div>';
-  document.getElementById("backToForm").onclick = function(){ state.si = SECTIONS.length-1; state.phase = "form"; render(); };
+  document.getElementById("backToForm").onclick = function(){ state.si = 0; state.phase = "form"; render(); };
   document.getElementById("genAnyway").onclick = doGenerate;
 }
 
@@ -314,14 +360,14 @@ function renderLoading(){
     + '<div class="dot"></div><div class="dot" style="animation-delay:.2s"></div><div class="dot" style="animation-delay:.4s"></div>'
     + '</div>'
     + '<h2 style="font-size:20px;margin-bottom:8px;">Je kracht wordt zwart op wit gezet...</h2>'
-    + '<p style="color:var(--muted);font-size:14px;">Even geduld, ik lees al je antwoorden en haal de rode draad eruit.</p>'
+    + '<p style="color:var(--muted);font-size:14px;">Even geduld, ik lees al je antwoorden en haal de rode draad eruit. Dit duurt ongeveer een halve minuut.</p>'
     + '</div>';
 }
 
 function renderError(){
   app.innerHTML = '<div class="card">'
     + '<h2 style="font-size:20px;margin-bottom:8px;">Er ging iets mis</h2>'
-    + '<p style="color:var(--muted);margin-bottom:18px;">Het lukte niet om je kaart te genereren. Probeer het opnieuw.</p>'
+    + '<p style="color:var(--muted);margin-bottom:18px;">Het lukte niet om je kaart te genereren. Je antwoorden zijn niet kwijt. Probeer het opnieuw.</p>'
     + '<button class="btn btn--primary" id="retry">Opnieuw proberen</button>'
     + '</div>';
   document.getElementById("retry").onclick = doGenerate;
@@ -329,17 +375,30 @@ function renderError(){
 
 function renderResult(){
   var r = state.result || {};
-  var pills = (r.helptMet||[]).map(function(x){
+  var pills = (r.helptMet || []).map(function(x){
     return '<span style="background:var(--accentSoft);color:#3F0508;font-size:13.5px;font-weight:600;padding:7px 13px;border-radius:999px;">' + esc(x) + '</span>';
   }).join("");
-  var proof = (r.bewijsmuur||[]).map(function(x){
+  var proof = (r.bewijsmuur || []).map(function(x){
     return '<div style="background:#FFFBF4;border:1px solid var(--line);border-left:3px solid var(--primary);border-radius:8px;padding:10px 13px;font-size:14.5px;">' + esc(x) + '</div>';
   }).join("");
+  var rich = (r.richtingen || []).map(function(x, i){
+    var bw = (x.bewijs || []).map(function(b){ return '<li style="margin-bottom:4px;">' + esc(b) + '</li>'; }).join("");
+    return '<div style="background:#FFFBF4;border:1px solid var(--line);border-top:4px solid var(--accent);border-radius:12px;padding:16px 18px;margin-bottom:12px;">'
+      + '<div class="eyebrow">Richting ' + (i + 1) + '</div>'
+      + '<h3 style="font-size:18px;margin:6px 0 8px;">' + esc(x.titel) + '</h3>'
+      + '<p style="font-size:14.5px;margin-bottom:8px;">' + esc(x.waarom) + '</p>'
+      + '<ul style="margin:0 0 10px 18px;padding:0;font-size:14px;">' + bw + '</ul>'
+      + '<p style="font-size:13.5px;color:var(--accent);font-weight:600;">Nog uit te zoeken: ' + esc(x.uittesten) + '</p>'
+      + '</div>';
+  }).join("");
+
   app.innerHTML = '<div>'
     + '<div class="card" style="border-top:5px solid var(--accent);">'
     + '<div class="eyebrow">Jouw VA Kaart</div>'
     + '<h1 style="font-size:26px;margin:10px 0 4px;color:var(--primary);">' + esc(r.krachtZin) + '</h1>'
-    + '<h3 style="font-size:16px;margin:26px 0 10px;">Ik help het beste met</h3>'
+    + '<h3 style="font-size:16px;margin:26px 0 10px;">Twee mogelijke specialisaties</h3>'
+    + rich
+    + '<h3 style="font-size:16px;margin:26px 0 10px;">Dit doe je het liefst</h3>'
     + '<div style="display:flex;flex-wrap:wrap;gap:8px;">' + pills + '</div>'
     + '<h3 style="font-size:16px;margin:26px 0 10px;">Jouw bewijsmuur</h3>'
     + '<div style="display:grid;gap:8px;">' + proof + '</div>'
@@ -355,7 +414,7 @@ function renderResult(){
     + '</div>'
     + '<div class="card" style="margin-top:16px;background:var(--ink);border-color:var(--ink);">'
     + '<div style="font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accentSoft);font-weight:700;">En nu?</div>'
-    + '<p style="color:#FDFDED;font-size:16px;margin:10px 0 20px;font-family:\'Fraunces\',serif;">' + esc(r.conclusie) + '</p>'
+    + '<p class="serif" style="color:#FDFDED;font-size:16px;margin:10px 0 20px;font-weight:400;line-height:1.5;">' + esc(r.conclusie) + '</p>'
     + '<a href="' + BOOKING_URL + '" target="_blank" rel="noreferrer" class="btn btn--accent">Plan je gratis kennismakingsgesprek</a>'
     + '</div>'
     + '<div class="row noprint">'
@@ -367,33 +426,50 @@ function renderResult(){
   document.getElementById("copy").onclick = copyKaart;
   document.getElementById("copymsg").onclick = copyMsg;
   document.getElementById("print").onclick = function(){ window.print(); };
-  document.getElementById("again").onclick = function(){ state.phase="intro"; state.si=0; state.result=null; render(); };
+  document.getElementById("again").onclick = function(){ state.phase = "intro"; state.si = 0; state.result = null; render(); };
 }
 
 function copyMsg(){
   navigator.clipboard.writeText(MIRROR_MSG).then(function(){
     state.copiedMsg = true; render();
-    setTimeout(function(){ state.copiedMsg = false; if(state.phase==="result") render(); }, 1800);
+    setTimeout(function(){ state.copiedMsg = false; if(state.phase === "result") render(); }, 1800);
   }).catch(function(){});
+}
+
+function tasksText(){
+  var done = [], energy = [], drain = [];
+  TASKS.forEach(function(t){
+    var s = state.tasks[t.id] || {};
+    if(s.done) done.push(t.label);
+    if(s.energy) energy.push(t.label);
+    if(s.drain) drain.push(t.label);
+  });
+  return "Heb ik voor klanten gedaan: " + (done.join(", ") || "niets aangevinkt")
+    + "\nGeeft mij energie: " + (energy.join(", ") || "niets aangevinkt")
+    + "\nKost mij energie: " + (drain.join(", ") || "niets aangevinkt");
 }
 
 function doGenerate(){
   state.phase = "loading"; render();
-  var compiled = ALL.map(function(q){
-    var a = (state.answers[q.id]||"").trim();
+  var parts = ALL.map(function(q){
+    var a = (state.answers[q.id] || "").trim();
     return a ? "Vraag: " + q.label + "\nAntwoord: " + a : null;
-  }).filter(Boolean).join("\n\n");
+  }).filter(Boolean);
+  parts.push("Takenlijst (aangevinkt door de VA):\n" + tasksText());
+  var compiled = parts.join("\n\n");
 
   fetch("/api/generate", {
-    method:"POST",
-    headers:{"content-type":"application/json"},
+    method: "POST",
+    headers: { "content-type": "application/json" },
     body: JSON.stringify({ answers: compiled })
   }).then(function(res){
     if(!res.ok) throw new Error("bad status");
     return res.json();
   }).then(function(data){
-    var clean = (data.text||"").replace(/```json/g,"").replace(/```/g,"").trim();
-    state.result = JSON.parse(clean);
+    var raw = data.text || "";
+    var a = raw.indexOf("{");
+    var b = raw.lastIndexOf("}");
+    state.result = JSON.parse(raw.slice(a, b + 1));
     state.phase = "result"; render();
   }).catch(function(){
     state.phase = "error"; render();
@@ -402,13 +478,16 @@ function doGenerate(){
 
 function copyKaart(){
   var r = state.result; if(!r) return;
-  var txt = "MIJN VA KAART\n\n" + r.krachtZin + "\n\nIk help het beste met:\n"
-    + (r.helptMet||[]).map(function(x){ return "- " + x; }).join("\n")
-    + "\n\nMijn bewijsmuur:\n" + (r.bewijsmuur||[]).map(function(x){ return "- " + x; }).join("\n")
+  var txt = "MIJN VA KAART\n\n" + r.krachtZin + "\n\nTwee mogelijke specialisaties:\n"
+    + (r.richtingen || []).map(function(x, i){
+        return (i + 1) + ". " + x.titel + "\n" + x.waarom + "\nNog uit te zoeken: " + x.uittesten;
+      }).join("\n\n")
+    + "\n\nDit doe ik het liefst:\n" + (r.helptMet || []).map(function(x){ return "- " + x; }).join("\n")
+    + "\n\nMijn bewijsmuur:\n" + (r.bewijsmuur || []).map(function(x){ return "- " + x; }).join("\n")
     + "\n\nDe twijfel die ik loslaat:\n" + r.twijfelLoslaten + "\n\n" + r.conclusie;
   navigator.clipboard.writeText(txt).then(function(){
     state.copied = true; render();
-    setTimeout(function(){ state.copied = false; if(state.phase==="result") render(); }, 1800);
+    setTimeout(function(){ state.copied = false; if(state.phase === "result") render(); }, 1800);
   }).catch(function(){});
 }
 
