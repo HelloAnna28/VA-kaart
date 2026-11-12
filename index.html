@@ -33,6 +33,8 @@ textarea:focus{border-color:var(--primary2);box-shadow:0 0 0 3px rgba(63,5,8,.16
 .eyebrow{font-weight:700;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);}
 .q{font-weight:600;font-size:15px;margin-bottom:7px;}
 .hint{font-size:13px;color:var(--muted);margin-bottom:9px;font-style:italic;}
+.subhead{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:17px;color:var(--accent);
+  margin:6px 0 10px;padding-top:14px;border-top:1px solid var(--line);}
 .live-feedback{font-size:13px;color:var(--accent);font-weight:600;margin-top:7px;padding:8px 12px;
   background:#FFF8F0;border-radius:8px;border-left:3px solid var(--accent);}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:18px;}
@@ -67,7 +69,7 @@ textarea:focus{border-color:var(--primary2);box-shadow:0 0 0 3px rgba(63,5,8,.16
 <script>
 var BOOKING_URL = "https://tidycal.com/loyalvacoaching/kennismaking";
 var MIRROR_MSG = "Hey! Ik ben bezig met een oefening voor mijn VA-bedrijf en ik heb jouw eerlijke mening nodig. Kun je me vertellen: 1) Waarvoor bel of app je mij als je ergens niet uitkomt? 2) Wat zou jij zeggen als je mij aan iemand anders zou omschrijven? \u2764\uFE0F";
-var MIN_ANSWERS = 8;
+var MIN_ANSWERS = 10;
 
 var TASKS = [
   { id:"t1",  label:"E-mail en agenda beheren" },
@@ -94,13 +96,16 @@ var TASKS = [
 
 var SECTIONS = [
   {
-    title: "Jouw klantwerk",
-    intro: "Je bent al gestart, dus je hebt echte gegevens. Daar beginnen we, want je klantwerk laat zien waar je nu al waarde levert. Wees concreet: wie was de klant, wat deed je precies, wat was het resultaat?",
+    title: "Jouw klanten",
+    intro: "Je bent al gestart, dus je hebt echte gegevens. Noem hier tot drie klanten. Ook een proefklus of een kleine klus telt. We zoeken patronen: welk type ondernemer en welk soort probleem komt steeds terug? Daar ontstaat een specialisatie uit.",
     qs: [
-      { id:"k1", label:"Welke klussen heb je tot nu toe voor klanten gedaan? Noem per klus voor wie het was (type ondernemer of branche) en wat je precies deed.", big:true },
-      { id:"k2", label:"Welke klus kwam het vaakst terug, of werd je het vaakst voor gevraagd?" },
-      { id:"k3", label:"Wie was je favoriete klant, en wat maakte die samenwerking zo goed?", hint:"Denk aan het type ondernemer, het soort werk en hoe jullie samenwerkten." },
-      { id:"k4", label:"Welke reactie of welk compliment van een klant is je het meest bijgebleven? Wat had je toen gedaan?" },
+      { id:"c1a", grp:"Klant 1", heading:"Klant 1", label:"Wie was dit? Noem het type ondernemer, de branche en hoe lang diegene al bezig was.", hint:"Bijvoorbeeld: 'Een coach, 2 jaar bezig, werkt alleen en kreeg het niet meer bijgehouden.'" },
+      { id:"c1b", grp:"Klant 1", label:"Wat deed je voor deze klant, welk probleem loste je op, en wat was het resultaat of de reactie?" },
+      { id:"c2a", grp:"Klant 2", heading:"Klant 2", label:"Wie was dit? Noem het type ondernemer, de branche en hoe lang diegene al bezig was." },
+      { id:"c2b", grp:"Klant 2", label:"Wat deed je voor deze klant, welk probleem loste je op, en wat was het resultaat of de reactie?" },
+      { id:"c3a", grp:"Klant 3", heading:"Klant 3 (optioneel)", label:"Wie was dit? Noem het type ondernemer, de branche en hoe lang diegene al bezig was." },
+      { id:"c3b", grp:"Klant 3", label:"Wat deed je voor deze klant, welk probleem loste je op, en wat was het resultaat of de reactie?" },
+      { id:"k3", heading:"Terugkijken", label:"Welke van deze klanten was je favoriet, en wat maakte die samenwerking zo goed?" },
       { id:"k5", label:"Waar zeg je nu ja op, terwijl je eigenlijk liever nee zou zeggen?", hint:"Wat je aanneemt maar niet leuk vindt, zegt net zoveel als wat je graag doet." }
     ]
   },
@@ -116,8 +121,18 @@ var SECTIONS = [
     qs: [
       { id:"b1", label:"In welke branche of sector heb je gewerkt, hoeveel jaar, en wat deed je daar precies?" },
       { id:"b2", label:"Met welke systemen, programma's en tools heb je daar gewerkt?", hint:"Noem alles, ook interne systemen of branchesoftware. Kennis van een specifiek systeem is vaak een directe niche." },
-      { id:"b3", label:"Wat ging er in die branche steeds fout, of kostte mensen onnodig veel tijd, terwijl jij wist hoe het beter kon?" },
-      { id:"b4", label:"Welk type ondernemer begrijp jij het beste, en waarom?", hint:"Bijvoorbeeld een coach, een zzp'er in de zorg, een webshop of een praktijk." }
+      { id:"b3", label:"Wat ging er in die branche steeds fout, of kostte mensen onnodig veel tijd, terwijl jij wist hoe het beter kon?" }
+    ]
+  },
+  {
+    title: "Jouw ideale klant",
+    intro: "Een specialisatie wordt scherp zodra je weet voor wie je het doet. Kijk naar je beste klanten en naar wat je in dit werk het liefst wilt. Kiezen is spannend, maar het maakt het voor een klant een stuk makkelijker om jou te herkennen.",
+    qs: [
+      { id:"i1", label:"Wat hebben je beste klanten gemeen?", hint:"Denk aan de branche, de fase van hun bedrijf, hun manier van werken of hun soort persoonlijkheid." },
+      { id:"i2", label:"Welk probleem los jij voor hen op? Schrijf het in hun eigen woorden: wat zeggen ze als ze bij je aankomen?", hint:"Bijvoorbeeld: 'Ik loop achter met alles wat niet mijn vak is en ik weet niet waar ik moet beginnen.'" },
+      { id:"i3", label:"Met wat voor ondernemers wil je juist niet meer werken, en waarom niet?" },
+      { id:"i4", label:"Waar zie je ondernemers zoals je ideale klant? Denk aan netwerken, Facebookgroepen, platforms of evenementen." },
+      { id:"i5", label:"Zou je liever specialist worden in een taak, een branche of een type klant? Kies er een en leg uit waarom.", hint:"Bijvoorbeeld een taak (administratie), een branche (de zorg) of een type klant (coaches met een jonge praktijk)." }
     ]
   },
   {
@@ -125,8 +140,7 @@ var SECTIONS = [
     intro: "Anderen zien jou vaak scherper dan jij jezelf ziet. Wat voor jou vanzelfsprekend is, is voor een ander soms goud waard.",
     qs: [
       { id:"a1", label:"Waar vragen mensen jou altijd om hulp, ook buiten werk? Geef een concreet voorbeeld.", hint:"Bijvoorbeeld: 'Mijn vriendinnen vragen altijd of ik hun mailbox wil opruimen.'" },
-      { id:"a2", label:"Wat zeiden collega's, leidinggevenden of klanten dat jij goed deed, terwijl jij dacht 'maar dat is toch normaal'?" },
-      { id:"a3", label:"Wat wuif jij weg als iemand je een compliment geeft?", hint:"'Ach, dat stelde niks voor.' Wat stelde het dan wel voor?" }
+      { id:"a2", label:"Wat zeiden collega's, leidinggevenden of klanten dat jij goed deed, terwijl jij dacht 'maar dat is toch normaal'?" }
     ]
   },
   {
@@ -144,8 +158,7 @@ var SECTIONS = [
       { id:"t1a", label:"Wat is je grootste prestatie voor een klant tot nu toe? Wat was de situatie, wat deed jij, en wat was het resultaat?", big:true },
       { id:"t2a", label:"Wat zeg je nu als iemand vraagt wat je doet? Schrijf het letterlijk op.", hint:"Lees het daarna terug. Voelt het scherp, of vaag?" },
       { id:"t3a", label:"Wat denk je dat de reden is dat klanten (nog) niet vanzelf voor jou kiezen, of dat je agenda nog niet vol zit?" },
-      { id:"t4a", label:"Wat houdt je tegen om duidelijker te kiezen, je tarief te verhogen of nee te zeggen? Wees specifiek.", hint:"'Ik ben niet goed genoeg' is geen antwoord. Wat precies?" },
-      { id:"t5a", label:"Als een vriendin met jouw ervaring vroeg 'ben ik goed genoeg om dit als bedrijf te doen?', wat zou jij letterlijk tegen haar zeggen?" }
+      { id:"t4a", label:"Wat houdt je tegen om duidelijker te kiezen, je tarief te verhogen of nee te zeggen? Wees specifiek.", hint:"'Ik ben niet goed genoeg' is geen antwoord. Wat precies?" }
     ]
   }
 ];
@@ -160,25 +173,30 @@ function esc(s){ return String(s == null ? "" : s).replace(/&/g,"&amp;").replace
 function answered(){ return ALL.filter(function(q){ return (state.answers[q.id]||"").trim(); }).length; }
 
 var KORT_FEEDBACK = {
-  k1: "Noem per klus wie de klant was (welke branche of welk type ondernemer) en wat je precies deed. Daar bouwen we je specialisatie op.",
-  k2: "Welke klus kwam het vaakst terug? Een patroon in je klantwerk is vaak je eerste aanwijzing voor een specialisatie.",
+  c1a: "Noem het type ondernemer, de branche en hoe lang die al bezig was. Daar zoeken we patronen in.",
+  c1b: "Wat deed je precies, welk probleem loste je op en wat was het resultaat? Hoe concreter, hoe beter.",
+  c2a: "Noem het type ondernemer, de branche en hoe lang die al bezig was. Daar zoeken we patronen in.",
+  c2b: "Wat deed je precies, welk probleem loste je op en wat was het resultaat?",
+  c3a: "Noem het type ondernemer, de branche en hoe lang die al bezig was.",
+  c3b: "Wat deed je precies, welk probleem loste je op en wat was het resultaat?",
   k3: "Wat maakte dit je favoriete klant? Denk aan het type ondernemer, het soort werk en hoe jullie samenwerkten.",
-  k4: "Wat zei de klant precies, of wat gebeurde er? Hoe letterlijker, hoe beter.",
   k5: "Wees hier eerlijk. Wat je nu aanneemt maar niet leuk vindt, is minstens zo belangrijk als wat je graag doet.",
   b1: "Noem de branche, hoeveel jaar en wat je daar precies deed. Je achtergrond is vaak je grootste voorsprong.",
   b2: "Noem zoveel mogelijk programma's en systemen. Kennis van een specifiek systeem is vaak een directe niche.",
   b3: "Denk aan irritaties en fouten die jij steeds zag. Daar zit meestal je visie en je specialisatie.",
-  b4: "Welk type ondernemer begrijp jij het snelst, en waarom? Denk aan een echte klant of iemand die je kent.",
+  i1: "Kijk naar je twee of drie beste klanten. Wat is hetzelfde: de branche, de fase van hun bedrijf, hun manier van werken?",
+  i2: "Schrijf het zoals de klant het zou zeggen, in zijn eigen woorden. Wat zegt hij als hij bij je aankomt?",
+  i3: "Wees eerlijk. Wie je niet meer wilt, is net zo belangrijk om te weten als wie je wel wilt.",
+  i4: "Waar komen deze ondernemers samen? Een naam van een groep, netwerk of platform is al genoeg.",
+  i5: "Kies er een en leg uit waarom. Het gaat er niet om dat het voor altijd is, maar om te voelen wat bij je past.",
   a1: "Noem een echt voorbeeld: wie vroeg je om hulp, en waarmee precies?",
   a2: "Wat zei die collega of leidinggevende echt? Hoe concreter, hoe beter je kaart wordt.",
-  a3: "Wat wuifde je weg, en wat had je toen eigenlijk gedaan? Dat is vaak je blinde vlek.",
   v1: "Er is echt iets wat jou stoort of opvalt in de branche waar je vandaan komt. Iets waarbij je denkt: dit kan zoveel beter. Wat is dat?",
   v2: "Denk aan iets wat je vaak ziet bij andere VA's en waar jij anders over denkt. Dat verschil maakt je herkenbaar.",
   t1a: "Dit is een van de krachtigste vragen. Wat was de situatie, wat deed jij, en wat was het resultaat?",
   t2a: "Schrijf het echt letterlijk op, zoals je het nu tegen iemand zou zeggen. Dan zien we samen of het scherp genoeg is.",
   t3a: "Wees eerlijk. Wat denk jij dat een klant ziet, of juist niet ziet, als hij naar jou kijkt?",
-  t4a: "Probeer specifieker te zijn. Is het kennis, ervaring, zelfvertrouwen, of iets anders? Dat helpt om de twijfel goed te weerleggen.",
-  t5a: "Doe eens alsof je het echt tegen een vriendin zegt. Wat zou je haar vertellen?"
+  t4a: "Probeer specifieker te zijn. Is het kennis, ervaring, zelfvertrouwen, of iets anders? Dat helpt om de twijfel goed te weerleggen."
 };
 
 function getFeedback(qId, a){
@@ -231,8 +249,9 @@ function renderIntro(){
   app.innerHTML = '<div class="card">'
     + '<div class="eyebrow">Werkblad</div>'
     + '<h1 style="font-size:30px;margin:8px 0 14px;">Jij kunt meer dan je verkoopt</h1>'
-    + '<p style="color:var(--muted);margin-bottom:16px;">Je bent gestart als VA en je hebt al klanten gehad. Je kunt je werk goed, maar als iemand vraagt wat je precies doet, hoor je jezelf iets vaags zeggen. Het probleem is niet dat jij niets bijzonders kunt. Je vindt je kracht zo vanzelfsprekend dat je hem zelf niet meer ziet. Dit werkblad gebruikt je eigen klantwerk om te laten zien waar je het verschil maakt.</p>'
-    + '<p style="font-size:14px;color:var(--muted);margin-bottom:22px;">6 korte delen, ongeveer een half uur. Hoe concreter je antwoorden, hoe scherper je kaart. Je antwoorden blijven op dit scherm. Aan het eind krijg je je persoonlijke VA Kaart met twee mogelijke specialisaties.</p>'
+    + '<p style="color:var(--muted);margin-bottom:16px;">Je bent gestart als VA en je hebt al klanten gehad. Je kunt je werk goed, maar als iemand vraagt wat je precies doet, hoor je jezelf iets vaags zeggen. Het probleem is niet dat jij niets bijzonders kunt. Je vindt je kracht zo vanzelfsprekend dat je hem zelf niet meer ziet. Dit werkblad gebruikt je eigen klantwerk om te laten zien voor wie en waarin je het verschil maakt.</p>'
+    + '<p style="color:var(--muted);margin-bottom:16px;">De VA Kaart is een VA-coach die je helpt kiezen voor wie je het wilt doen en waar jij goed in bent. Ze is liefdevol streng: ze gelooft in je, maar laat geen vage antwoorden door. Neem er de tijd voor en wees eerlijk, dan sluit je dit af met een voldaan gevoel.</p>'
+    + '<p style="font-size:14px;color:var(--muted);margin-bottom:22px;">8 korte delen, ongeveer een half uur. Hoe concreter je antwoorden, hoe scherper je kaart. Je antwoorden blijven op dit scherm. Aan het eind krijg je je persoonlijke VA Kaart met je ideale klant, een eerste positioneringszin en twee mogelijke specialisaties.</p>'
     + '<button class="btn btn--primary" id="start">Start het werkblad</button>'
     + '</div>';
   document.getElementById("start").onclick = function(){ state.phase = "form"; render(); };
@@ -259,7 +278,8 @@ function renderForm(){
   var body = "";
   if(sec.tasks) body += renderTasks();
   body += sec.qs.map(function(q){
-    return '<div style="margin-bottom:20px;">'
+    return (q.heading ? '<div class="subhead">' + esc(q.heading) + '</div>' : '')
+      + '<div style="margin-bottom:20px;">'
       + '<div class="q">' + esc(q.label) + '</div>'
       + (q.hint ? '<div class="hint">' + esc(q.hint) + '</div>' : '')
       + '<textarea data-id="' + q.id + '" placeholder="Jouw antwoord..." style="' + (q.big ? 'min-height:130px;' : '') + '">' + esc(state.answers[q.id] || "") + '</textarea>'
@@ -344,7 +364,7 @@ function renderVague(){
   app.innerHTML = '<div class="card">'
     + '<div class="eyebrow">Even een check</div>'
     + '<h2 style="font-size:22px;margin:8px 0 12px;">Voordat ik je kaart maak...</h2>'
-    + '<p style="color:var(--muted);font-size:14.5px;margin-bottom:20px;">Bij deze vragen kan je antwoord nog concreter. Een goede kaart heeft echt bewijs nodig. Wil je ze nog even aanvullen? Een paar zinnen extra maakt een groot verschil.</p>'
+    + '<p style="color:var(--muted);font-size:14.5px;margin-bottom:20px;">Ik geloof in je, en juist daarom laat ik dit nog niet door. Bij deze vragen kan je antwoord scherper. Een goede kaart heeft echt bewijs nodig, en jij hebt dat in huis. Vul ze nog even aan, een paar zinnen extra maakt een groot verschil.</p>'
     + items
     + '<div class="row">'
     + '<button class="btn btn--ghost" id="backToForm">Terug om aan te vullen</button>'
@@ -375,6 +395,7 @@ function renderError(){
 
 function renderResult(){
   var r = state.result || {};
+  var dg = r.doelgroep || {};
   var pills = (r.helptMet || []).map(function(x){
     return '<span style="background:var(--accentSoft);color:#3F0508;font-size:13.5px;font-weight:600;padding:7px 13px;border-radius:999px;">' + esc(x) + '</span>';
   }).join("");
@@ -391,11 +412,26 @@ function renderResult(){
       + '<p style="font-size:13.5px;color:var(--accent);font-weight:600;">Nog uit te zoeken: ' + esc(x.uittesten) + '</p>'
       + '</div>';
   }).join("");
+  var posHtml = r.positionering
+    ? '<div style="background:var(--ink);color:#FDFDED;border-radius:12px;padding:16px 18px;margin-top:18px;">'
+      + '<div style="font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accentSoft);font-weight:700;margin-bottom:6px;">Jouw positioneringszin, eerste versie</div>'
+      + '<div class="serif" style="font-size:17px;font-weight:400;line-height:1.45;">' + esc(r.positionering) + '</div>'
+      + '</div>'
+    : '';
+  var vind = (dg.vindplekken || []).map(function(v){ return '<li style="margin-bottom:3px;">' + esc(v) + '</li>'; }).join("");
+  var dgHtml = (dg.omschrijving || dg.probleem)
+    ? '<h3 style="font-size:16px;margin:26px 0 10px;">Jouw ideale klant</h3>'
+      + '<p style="font-size:14.5px;margin-bottom:8px;">' + esc(dg.omschrijving) + '</p>'
+      + '<p style="font-size:14.5px;margin-bottom:8px;"><strong>Het probleem dat jij oplost:</strong> ' + esc(dg.probleem) + '</p>'
+      + (vind ? '<p style="font-size:14.5px;margin-bottom:4px;"><strong>Hier vind je ze:</strong></p><ul style="margin:0 0 0 18px;padding:0;font-size:14px;">' + vind + '</ul>' : '')
+    : '';
 
   app.innerHTML = '<div>'
     + '<div class="card" style="border-top:5px solid var(--accent);">'
     + '<div class="eyebrow">Jouw VA Kaart</div>'
     + '<h1 style="font-size:26px;margin:10px 0 4px;color:var(--primary);">' + esc(r.krachtZin) + '</h1>'
+    + posHtml
+    + dgHtml
     + '<h3 style="font-size:16px;margin:26px 0 10px;">Twee mogelijke specialisaties</h3>'
     + rich
     + '<h3 style="font-size:16px;margin:26px 0 10px;">Dit doe je het liefst</h3>'
@@ -453,7 +489,8 @@ function doGenerate(){
   state.phase = "loading"; render();
   var parts = ALL.map(function(q){
     var a = (state.answers[q.id] || "").trim();
-    return a ? "Vraag: " + q.label + "\nAntwoord: " + a : null;
+    var lab = (q.grp ? "[" + q.grp + "] " : "") + q.label;
+    return a ? "Vraag: " + lab + "\nAntwoord: " + a : null;
   }).filter(Boolean);
   parts.push("Takenlijst (aangevinkt door de VA):\n" + tasksText());
   var compiled = parts.join("\n\n");
@@ -478,7 +515,11 @@ function doGenerate(){
 
 function copyKaart(){
   var r = state.result; if(!r) return;
-  var txt = "MIJN VA KAART\n\n" + r.krachtZin + "\n\nTwee mogelijke specialisaties:\n"
+  var dg = r.doelgroep || {};
+  var txt = "MIJN VA KAART\n\n" + r.krachtZin
+    + (r.positionering ? "\n\nMijn positioneringszin (eerste versie):\n" + r.positionering : "")
+    + (dg.omschrijving ? "\n\nMijn ideale klant:\n" + dg.omschrijving + "\nHet probleem dat ik oplos: " + (dg.probleem || "") + "\nHier vind ik ze: " + (dg.vindplekken || []).join(", ") : "")
+    + "\n\nTwee mogelijke specialisaties:\n"
     + (r.richtingen || []).map(function(x, i){
         return (i + 1) + ". " + x.titel + "\n" + x.waarom + "\nNog uit te zoeken: " + x.uittesten;
       }).join("\n\n")
