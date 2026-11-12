@@ -166,7 +166,10 @@ var SECTIONS = [
 var ALL = [];
 SECTIONS.forEach(function(s){ s.qs.forEach(function(q){ ALL.push(q); }); });
 
-var state = { phase:"intro", si:0, answers:{}, tasks:{}, result:null, vaguWarnings:[], copied:false, copiedMsg:false };
+var state = {
+  phase:"intro", si:0, answers:{}, tasks:{}, result:null, vaguWarnings:[],
+  probe:null, probeAnswers:{}, copied:false, copiedMsg:false
+};
 var app = document.getElementById("app");
 
 function esc(s){ return String(s == null ? "" : s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
@@ -240,6 +243,8 @@ function render(){
   if(state.phase === "intro") renderIntro();
   else if(state.phase === "form") renderForm();
   else if(state.phase === "vague") renderVague();
+  else if(state.phase === "probeLoading") renderProbeLoading();
+  else if(state.phase === "probe") renderProbe();
   else if(state.phase === "loading") renderLoading();
   else if(state.phase === "error") renderError();
   else if(state.phase === "result") renderResult();
@@ -250,8 +255,8 @@ function renderIntro(){
     + '<div class="eyebrow">Werkblad</div>'
     + '<h1 style="font-size:30px;margin:8px 0 14px;">Jij kunt meer dan je verkoopt</h1>'
     + '<p style="color:var(--muted);margin-bottom:16px;">Je bent gestart als VA en je hebt al klanten gehad. Je kunt je werk goed, maar als iemand vraagt wat je precies doet, hoor je jezelf iets vaags zeggen. Het probleem is niet dat jij niets bijzonders kunt. Je vindt je kracht zo vanzelfsprekend dat je hem zelf niet meer ziet. Dit werkblad gebruikt je eigen klantwerk om te laten zien voor wie en waarin je het verschil maakt.</p>'
-    + '<p style="color:var(--muted);margin-bottom:16px;">De VA Kaart is een VA-coach die je helpt kiezen voor wie je het wilt doen en waar jij goed in bent. Ze is liefdevol streng: ze gelooft in je, maar laat geen vage antwoorden door. Neem er de tijd voor en wees eerlijk, dan sluit je dit af met een voldaan gevoel.</p>'
-    + '<p style="font-size:14px;color:var(--muted);margin-bottom:22px;">8 korte delen, ongeveer een half uur. Hoe concreter je antwoorden, hoe scherper je kaart. Je antwoorden blijven op dit scherm. Aan het eind krijg je je persoonlijke VA Kaart met je ideale klant, een eerste positioneringszin en twee mogelijke specialisaties.</p>'
+    + '<p style="color:var(--muted);margin-bottom:16px;">De VA Kaart is een VA-coach die je helpt kiezen voor wie je het wilt doen en waar jij goed in bent. Ze is liefdevol streng: ze gelooft in je, maar laat geen vage antwoorden door. Als je klaar bent met de vragen, leest ze alles door en stelt ze je nog een paar doorvragen om bij de kern te komen. Neem er de tijd voor en wees eerlijk, dan sluit je dit af met een voldaan gevoel.</p>'
+    + '<p style="font-size:14px;color:var(--muted);margin-bottom:22px;">7 korte delen, ongeveer een half uur. Je antwoorden blijven op dit scherm. Aan het eind krijg je je persoonlijke VA Kaart met je ideale klant, een eerste positioneringszin en twee mogelijke specialisaties.</p>'
     + '<button class="btn btn--primary" id="start">Start het werkblad</button>'
     + '</div>';
   document.getElementById("start").onclick = function(){ state.phase = "form"; render(); };
@@ -349,7 +354,7 @@ function checkAndGenerate(){
     state.phase = "vague";
     render();
   } else {
-    doGenerate();
+    doProbe();
   }
 }
 
@@ -363,15 +368,56 @@ function renderVague(){
   }).join("");
   app.innerHTML = '<div class="card">'
     + '<div class="eyebrow">Even een check</div>'
-    + '<h2 style="font-size:22px;margin:8px 0 12px;">Voordat ik je kaart maak...</h2>'
+    + '<h2 style="font-size:22px;margin:8px 0 12px;">Voordat ik verder lees...</h2>'
     + '<p style="color:var(--muted);font-size:14.5px;margin-bottom:20px;">Ik geloof in je, en juist daarom laat ik dit nog niet door. Bij deze vragen kan je antwoord scherper. Een goede kaart heeft echt bewijs nodig, en jij hebt dat in huis. Vul ze nog even aan, een paar zinnen extra maakt een groot verschil.</p>'
     + items
     + '<div class="row">'
     + '<button class="btn btn--ghost" id="backToForm">Terug om aan te vullen</button>'
-    + '<button class="btn btn--primary" id="genAnyway">Genereer toch</button>'
+    + '<button class="btn btn--primary" id="genAnyway">Ga toch verder</button>'
     + '</div></div>';
   document.getElementById("backToForm").onclick = function(){ state.si = 0; state.phase = "form"; render(); };
-  document.getElementById("genAnyway").onclick = doGenerate;
+  document.getElementById("genAnyway").onclick = doProbe;
+}
+
+function renderProbeLoading(){
+  app.innerHTML = '<div class="card" style="text-align:center;">'
+    + '<div style="display:flex;gap:8px;justify-content:center;margin-bottom:18px;">'
+    + '<div class="dot"></div><div class="dot" style="animation-delay:.2s"></div><div class="dot" style="animation-delay:.4s"></div>'
+    + '</div>'
+    + '<h2 style="font-size:20px;margin-bottom:8px;">Ik lees al je antwoorden...</h2>'
+    + '<p style="color:var(--muted);font-size:14px;">Ik kijk waar het nog scherper kan en bedenk een paar vragen om bij de kern te komen.</p>'
+    + '</div>';
+}
+
+function renderProbe(){
+  var p = state.probe || {};
+  var qs = (p.vragen || []).map(function(v, i){
+    return '<div style="margin-bottom:20px;">'
+      + '<div class="q">' + esc(v) + '</div>'
+      + '<textarea data-id="p' + i + '" placeholder="Jouw antwoord..." style="min-height:90px;">' + esc(state.probeAnswers["p" + i] || "") + '</textarea>'
+      + '</div>';
+  }).join("");
+  app.innerHTML = '<div class="card">'
+    + '<div class="eyebrow">Doorvragen</div>'
+    + '<h2 style="font-size:23px;margin:6px 0 10px;">Nog even scherper maken</h2>'
+    + '<p style="color:var(--muted);font-size:14.5px;margin-bottom:22px;">' + esc(p.intro) + '</p>'
+    + qs
+    + '</div>'
+    + '<div class="row noprint">'
+    + '<button class="btn btn--primary" id="probeGen">Maak mijn VA Kaart</button>'
+    + '<button class="btn btn--ghost" id="probeSkip">Sla over en maak mijn kaart</button>'
+    + '</div>';
+
+  app.querySelectorAll("textarea").forEach(function(t){
+    t.addEventListener("input", function(e){
+      state.probeAnswers[e.target.dataset.id] = e.target.value;
+    });
+  });
+  attachFeedback(app);
+
+  document.getElementById("probeGen").onclick = function(){ doGenerate(); };
+  document.getElementById("probeSkip").onclick = function(){ state.probeAnswers = {}; doGenerate(); };
+  scrollTo(0, 0);
 }
 
 function renderLoading(){
@@ -380,7 +426,7 @@ function renderLoading(){
     + '<div class="dot"></div><div class="dot" style="animation-delay:.2s"></div><div class="dot" style="animation-delay:.4s"></div>'
     + '</div>'
     + '<h2 style="font-size:20px;margin-bottom:8px;">Je kracht wordt zwart op wit gezet...</h2>'
-    + '<p style="color:var(--muted);font-size:14px;">Even geduld, ik lees al je antwoorden en haal de rode draad eruit. Dit duurt ongeveer een halve minuut.</p>'
+    + '<p style="color:var(--muted);font-size:14px;">Even geduld, ik haal de rode draad uit al je antwoorden. Dit duurt ongeveer een halve minuut.</p>'
     + '</div>';
 }
 
@@ -462,7 +508,7 @@ function renderResult(){
   document.getElementById("copy").onclick = copyKaart;
   document.getElementById("copymsg").onclick = copyMsg;
   document.getElementById("print").onclick = function(){ window.print(); };
-  document.getElementById("again").onclick = function(){ state.phase = "intro"; state.si = 0; state.result = null; render(); };
+  document.getElementById("again").onclick = function(){ state.phase = "intro"; state.si = 0; state.result = null; state.probe = null; state.probeAnswers = {}; render(); };
 }
 
 function copyMsg(){
@@ -485,28 +531,61 @@ function tasksText(){
     + "\nKost mij energie: " + (drain.join(", ") || "niets aangevinkt");
 }
 
-function doGenerate(){
-  state.phase = "loading"; render();
+function compileAnswers(includeProbe){
   var parts = ALL.map(function(q){
     var a = (state.answers[q.id] || "").trim();
     var lab = (q.grp ? "[" + q.grp + "] " : "") + q.label;
     return a ? "Vraag: " + lab + "\nAntwoord: " + a : null;
   }).filter(Boolean);
   parts.push("Takenlijst (aangevinkt door de VA):\n" + tasksText());
-  var compiled = parts.join("\n\n");
+  if(includeProbe && state.probe && state.probe.vragen){
+    state.probe.vragen.forEach(function(v, i){
+      var a = (state.probeAnswers["p" + i] || "").trim();
+      if(a) parts.push("Doorvraag van de coach: " + v + "\nAntwoord: " + a);
+    });
+  }
+  return parts.join("\n\n");
+}
 
+function parseJson(raw){
+  var a = raw.indexOf("{");
+  var b = raw.lastIndexOf("}");
+  return JSON.parse(raw.slice(a, b + 1));
+}
+
+function doProbe(){
+  state.phase = "probeLoading"; render();
   fetch("/api/generate", {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ answers: compiled })
+    body: JSON.stringify({ mode: "doorvragen", answers: compileAnswers(false) })
   }).then(function(res){
     if(!res.ok) throw new Error("bad status");
     return res.json();
   }).then(function(data){
-    var raw = data.text || "";
-    var a = raw.indexOf("{");
-    var b = raw.lastIndexOf("}");
-    state.result = JSON.parse(raw.slice(a, b + 1));
+    var p = parseJson(data.text || "");
+    var vragen = (p.vragen || []).filter(function(v){ return typeof v === "string" && v.trim(); }).slice(0, 3);
+    if(!vragen.length) throw new Error("geen vragen");
+    state.probe = { intro: p.intro || "Ik wil nog een paar dingen weten om je kaart echt raak te maken.", vragen: vragen };
+    state.probeAnswers = {};
+    state.phase = "probe"; render();
+  }).catch(function(){
+    state.probe = null;
+    doGenerate();
+  });
+}
+
+function doGenerate(){
+  state.phase = "loading"; render();
+  fetch("/api/generate", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ answers: compileAnswers(true) })
+  }).then(function(res){
+    if(!res.ok) throw new Error("bad status");
+    return res.json();
+  }).then(function(data){
+    state.result = parseJson(data.text || "");
     state.phase = "result"; render();
   }).catch(function(){
     state.phase = "error"; render();
