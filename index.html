@@ -26,6 +26,7 @@ textarea:focus{border-color:var(--primary2);box-shadow:0 0 0 3px rgba(63,5,8,.16
 .btn{font-family:inherit;font-weight:600;font-size:15px;border:none;border-radius:999px;
   padding:12px 22px;cursor:pointer;transition:transform .08s ease,opacity .2s;}
 .btn:active{transform:translateY(1px);}
+a.btn{text-decoration:none;display:inline-block;}
 .btn--primary{background:var(--primary);color:#FDFDED;}
 .btn--primary:disabled{opacity:.45;cursor:not-allowed;}
 .btn--ghost{background:transparent;color:var(--primary);border:1px solid var(--line);}
@@ -131,7 +132,6 @@ var SECTIONS = [
       { id:"i1", label:"Wat hebben je beste klanten gemeen?", hint:"Denk aan de branche, de fase van hun bedrijf, hun manier van werken of hun soort persoonlijkheid." },
       { id:"i2", label:"Welk probleem los jij voor hen op? Schrijf het in hun eigen woorden: wat zeggen ze als ze bij je aankomen?", hint:"Bijvoorbeeld: 'Ik loop achter met alles wat niet mijn vak is en ik weet niet waar ik moet beginnen.'" },
       { id:"i3", label:"Met wat voor ondernemers wil je juist niet meer werken, en waarom niet?" },
-      { id:"i4", label:"Waar zie je ondernemers zoals je ideale klant? Denk aan netwerken, Facebookgroepen, platforms of evenementen." },
       { id:"i5", label:"Zou je liever specialist worden in een taak, een branche of een type klant? Kies er een en leg uit waarom.", hint:"Bijvoorbeeld een taak (administratie), een branche (de zorg) of een type klant (coaches met een jonge praktijk)." }
     ]
   },
@@ -190,7 +190,6 @@ var KORT_FEEDBACK = {
   i1: "Kijk naar je twee of drie beste klanten. Wat is hetzelfde: de branche, de fase van hun bedrijf, hun manier van werken?",
   i2: "Schrijf het zoals de klant het zou zeggen, in zijn eigen woorden. Wat zegt hij als hij bij je aankomt?",
   i3: "Wees eerlijk. Wie je niet meer wilt, is net zo belangrijk om te weten als wie je wel wilt.",
-  i4: "Waar komen deze ondernemers samen? Een naam van een groep, netwerk of platform is al genoeg.",
   i5: "Kies er een en leg uit waarom. Het gaat er niet om dat het voor altijd is, maar om te voelen wat bij je past.",
   a1: "Noem een echt voorbeeld: wie vroeg je om hulp, en waarmee precies?",
   a2: "Wat zei die collega of leidinggevende echt? Hoe concreter, hoe beter je kaart wordt.",
@@ -237,6 +236,34 @@ function attachFeedback(container){
       if(existing) existing.remove();
     });
   });
+}
+
+function copyText(text, done){
+  function fallback(){
+    try {
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "");
+      ta.style.position = "fixed";
+      ta.style.top = "0";
+      ta.style.left = "0";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      ta.setSelectionRange(0, text.length);
+      var ok = document.execCommand("copy");
+      document.body.removeChild(ta);
+      done(!!ok);
+    } catch(e){
+      done(false);
+    }
+  }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){ done(true); }).catch(fallback);
+  } else {
+    fallback();
+  }
 }
 
 function render(){
@@ -338,7 +365,7 @@ function renderForm(){
   var next = document.getElementById("next");
   if(next) next.onclick = function(){ state.si++; scrollTo(0,0); render(); };
   var gen = document.getElementById("gen");
-  if(gen) gen.onclick = function(){ checkAndGenerate(); };
+  if(gen) gen.onclick = function(){ doProbe(); };
 }
 
 function checkAndGenerate(){
@@ -464,13 +491,13 @@ function renderResult(){
       + '<div class="serif" style="font-size:17px;font-weight:400;line-height:1.45;">' + esc(r.positionering) + '</div>'
       + '</div>'
     : '';
-  var vind = (dg.vindplekken || []).map(function(v){ return '<li style="margin-bottom:3px;">' + esc(v) + '</li>'; }).join("");
   var dgHtml = (dg.omschrijving || dg.probleem)
     ? '<h3 style="font-size:16px;margin:26px 0 10px;">Jouw ideale klant</h3>'
       + '<p style="font-size:14.5px;margin-bottom:8px;">' + esc(dg.omschrijving) + '</p>'
-      + '<p style="font-size:14.5px;margin-bottom:8px;"><strong>Het probleem dat jij oplost:</strong> ' + esc(dg.probleem) + '</p>'
-      + (vind ? '<p style="font-size:14.5px;margin-bottom:4px;"><strong>Hier vind je ze:</strong></p><ul style="margin:0 0 0 18px;padding:0;font-size:14px;">' + vind + '</ul>' : '')
+      + '<p style="font-size:14.5px;"><strong>Het probleem dat jij oplost:</strong> ' + esc(dg.probleem) + '</p>'
     : '';
+  var copyLabel = state.copiedMsg === true ? "Gekopieerd!" : (state.copiedMsg === "fail" ? "Kopiëren lukte niet, selecteer de tekst zelf" : "Kopieer dit appje");
+  var kaartLabel = state.copied === true ? "Gekopieerd!" : (state.copied === "fail" ? "Kopiëren lukte niet" : "Kopieer mijn kaart");
 
   app.innerHTML = '<div>'
     + '<div class="card" style="border-top:5px solid var(--accent);">'
@@ -486,13 +513,17 @@ function renderResult(){
     + '<div style="display:grid;gap:8px;">' + proof + '</div>'
     + '<h3 style="font-size:16px;margin:26px 0 10px;">De twijfel die je vandaag loslaat</h3>'
     + '<p style="font-size:14.5px;">' + esc(r.twijfelLoslaten) + '</p>'
+    + (r.eersteStap ? '<div style="background:var(--accentSoft);border-radius:12px;padding:16px 18px;margin-top:26px;"><div style="font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);font-weight:700;margin-bottom:6px;">Jouw eerste stap deze week</div><p style="font-size:15px;font-weight:600;line-height:1.5;">' + esc(r.eersteStap) + '</p></div>' : '')
     + '</div>'
     + '<div class="card" style="margin-top:16px;">'
     + '<div class="eyebrow">Volgende stap</div>'
     + '<h3 style="font-size:18px;margin:6px 0 8px;">De spiegel van anderen</h3>'
     + '<p style="color:var(--muted);font-size:14.5px;margin-bottom:14px;">Anderen zien jouw kracht vaak nog scherper dan jij. Stuur dit appje naar 3 mensen die je goed kennen en eerlijk zijn. Neem hun antwoorden mee naar je gratis kennismakingsgesprek.</p>'
-    + '<div style="background:#FFFBF4;border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:14.5px;margin-bottom:14px;">' + esc(MIRROR_MSG) + '</div>'
-    + '<button class="btn btn--primary" id="copymsg">' + (state.copiedMsg ? "Gekopieerd!" : "Kopieer dit appje") + '</button>'
+    + '<div id="mirrorbox" style="background:#FFFBF4;border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:14.5px;margin-bottom:14px;user-select:text;-webkit-user-select:text;">' + esc(MIRROR_MSG) + '</div>'
+    + '<div class="row" style="margin-top:0;">'
+    + '<button class="btn btn--primary" id="copymsg">' + copyLabel + '</button>'
+    + '<a class="btn btn--ghost" href="https://wa.me/?text=' + encodeURIComponent(MIRROR_MSG) + '" target="_blank" rel="noreferrer">Stuur via WhatsApp</a>'
+    + '</div>'
     + '</div>'
     + '<div class="card" style="margin-top:16px;background:var(--ink);border-color:var(--ink);">'
     + '<div style="font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accentSoft);font-weight:700;">En nu?</div>'
@@ -500,7 +531,7 @@ function renderResult(){
     + '<a href="' + BOOKING_URL + '" target="_blank" rel="noreferrer" class="btn btn--accent">Plan je gratis kennismakingsgesprek</a>'
     + '</div>'
     + '<div class="row noprint">'
-    + '<button class="btn btn--ghost" id="copy">' + (state.copied ? "Gekopieerd!" : "Kopieer mijn kaart") + '</button>'
+    + '<button class="btn btn--ghost" id="copy">' + kaartLabel + '</button>'
     + '<button class="btn btn--ghost" id="print">Bewaar als pdf</button>'
     + '<button class="btn btn--ghost" id="again">Opnieuw</button>'
     + '</div></div>';
@@ -512,10 +543,21 @@ function renderResult(){
 }
 
 function copyMsg(){
-  navigator.clipboard.writeText(MIRROR_MSG).then(function(){
-    state.copiedMsg = true; render();
-    setTimeout(function(){ state.copiedMsg = false; if(state.phase === "result") render(); }, 1800);
-  }).catch(function(){});
+  copyText(MIRROR_MSG, function(ok){
+    state.copiedMsg = ok ? true : "fail";
+    render();
+    if(!ok){
+      var box = document.getElementById("mirrorbox");
+      if(box && window.getSelection){
+        var range = document.createRange();
+        range.selectNodeContents(box);
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+    }
+    setTimeout(function(){ state.copiedMsg = false; if(state.phase === "result") render(); }, 2500);
+  });
 }
 
 function tasksText(){
@@ -597,18 +639,20 @@ function copyKaart(){
   var dg = r.doelgroep || {};
   var txt = "MIJN VA KAART\n\n" + r.krachtZin
     + (r.positionering ? "\n\nMijn positioneringszin (eerste versie):\n" + r.positionering : "")
-    + (dg.omschrijving ? "\n\nMijn ideale klant:\n" + dg.omschrijving + "\nHet probleem dat ik oplos: " + (dg.probleem || "") + "\nHier vind ik ze: " + (dg.vindplekken || []).join(", ") : "")
+    + (dg.omschrijving ? "\n\nMijn ideale klant:\n" + dg.omschrijving + "\nHet probleem dat ik oplos: " + (dg.probleem || "") : "")
     + "\n\nTwee mogelijke specialisaties:\n"
     + (r.richtingen || []).map(function(x, i){
         return (i + 1) + ". " + x.titel + "\n" + x.waarom + "\nNog uit te zoeken: " + x.uittesten;
       }).join("\n\n")
     + "\n\nDit doe ik het liefst:\n" + (r.helptMet || []).map(function(x){ return "- " + x; }).join("\n")
+    + (r.eersteStap ? "\n\nMijn eerste stap deze week:\n" + r.eersteStap : "")
     + "\n\nMijn bewijsmuur:\n" + (r.bewijsmuur || []).map(function(x){ return "- " + x; }).join("\n")
     + "\n\nDe twijfel die ik loslaat:\n" + r.twijfelLoslaten + "\n\n" + r.conclusie;
-  navigator.clipboard.writeText(txt).then(function(){
-    state.copied = true; render();
-    setTimeout(function(){ state.copied = false; if(state.phase === "result") render(); }, 1800);
-  }).catch(function(){});
+  copyText(txt, function(ok){
+    state.copied = ok ? true : "fail";
+    render();
+    setTimeout(function(){ state.copied = false; if(state.phase === "result") render(); }, 2500);
+  });
 }
 
 render();
