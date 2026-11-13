@@ -39,7 +39,7 @@ Antwoord UITSLUITEND met geldige JSON (geen markdown, geen codeblokken), met exa
 - "richtingen": array van precies 2 objecten. Elk object heeft: "titel" (de specialisatie in een korte formulering met taak, branche of thema en type klant, bijvoorbeeld "Administratie en systemen voor coaches"), "waarom" (2 zinnen waarom deze richting bij haar past, gebaseerd op haar antwoorden), "bewijs" (array van 2 tot 3 korte strings, concreet bewijs uit haar eigen antwoorden) en "uittesten" (1 zin: wat ze nog moet uitzoeken of testen voordat ze deze richting claimt). De twee richtingen moeten echt verschillen van elkaar. Is het bewijs voor een richting nog dun, bijvoorbeeld omdat ze maar één of twee klanten heeft gehad, zeg dat dan eerlijk bij "waarom" en baseer de richting op wat haar energie geeft en op haar achtergrond. Maak bewijs nooit groter dan het is.
 - "helptMet": array van 3 tot 5 korte strings, de taken waarvan uit haar antwoorden blijkt dat ze die het liefst en het beste doet.
 - "eersteStap": string van maximaal 2 zinnen met één concrete, kleine actie die ze deze week kan doen, in minder dan een uur, om richting 1 te testen. Formuleer het als opdracht aan haar, bijvoorbeeld haar positioneringszin voorleggen aan twee klanten en vragen wat ze herkennen, of haar bio aanpassen. Baseer de actie op wat uit haar antwoorden blijkt en verzin geen details.
-- "bewijsmuur": array van 4 tot 6 korte strings, concreet bewijs uit haar eigen antwoorden. Begin elke string met "Jij hebt bewezen dat...", "Jij weet hoe je..." of "Jij hebt laten zien dat...".
+- "bewijsmuur": array van 4 tot 6 korte strings, concreet bewijs uit haar eigen antwoorden. Begin elke string met "Jij hebt bewezen dat...", "Jij weet hoe je..." of "Jij hebt laten zien dat...". Wees eerlijk over hoe zwaar het bewijs is. Schrijf nooit dat één klant of een vriendin bewijst dat ze goed genoeg is, maar benoem wat er concreet is gebeurd.
 - "twijfelLoslaten": string, de specifieke twijfel die uit haar antwoorden spreekt, benoemd en weerlegd met bewijs uit haar eigen antwoorden.
 - "conclusie": string van 2 tot 4 zinnen, geschreven in de IK-VORM namens Anna zelf. Benoem welke van de twee richtingen volgens haar eigen bewijs het sterkst is, dat ze nu beter ziet waar haar kracht zit en voor wie, dat de andere helft de vertaling naar een aanbod is dat klanten herkennen en willen kopen (positionering), en nodig haar warm en zonder druk uit voor een gratis kennismakingsgesprek. Schrijf altijd "ik" en nooit "Anna" in de derde persoon.
 
@@ -61,7 +61,7 @@ Regels:
 - Citeer waar mogelijk haar eigen woorden, bijvoorbeeld: Je schrijft dat ze rust voelde. Wat kon ze na drie weken doen wat ze eerst niet kon?
 - Elke vraag is één concrete vraag die ze in een paar zinnen kan beantwoorden. Geen opsommingen en geen dubbele vragen.
 - Liefdevol streng: erken kort wat sterk is, en vraag dan precies naar wat nog ontbreekt.
-- Verzin niets. Baseer je alleen op wat ze schreef.
+- Verzin niets. Baseer je alleen op wat ze schreef. Noem in je vragen geen voorbeelden, branches of keuzemogelijkheden die zij niet zelf heeft genoemd. Stel de vraag open, zodat haar antwoord van haarzelf komt en niet van jou.
 - Gewone spreektaal in goed Nederlands. Geen lange gedachtestreepjes.
 
 Antwoord UITSLUITEND met geldige JSON (geen markdown, geen codeblokken), met exact deze sleutels:
